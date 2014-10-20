@@ -1,4 +1,4 @@
-guppy4j
+guppy4j / web
 =======
 
 Pure Java web framework
@@ -20,13 +20,6 @@ Requirements
 - Use interfaces and immutable objects wherever possible
 - TBD: JavaScript / Ajax support
 
-About the name
---------------
-
-"The guppy (Poecilia reticulata), also known as the millionfish, is one of 
-the most popular freshwater aquarium fish species in the world."
-
-http://en.wikipedia.org/wiki/Guppy
 
 Related libraries/frameworks
 ----------------------------
