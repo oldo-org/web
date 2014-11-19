@@ -1,13 +1,11 @@
 package org.guppy4j.web.samples;
 
 /**
- * TODO: Document this
+ * A Css sample
  */
 public class MyCss {
 
     {
-        _(body)._()
-
-
+        // TODO
     }
 }

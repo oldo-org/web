@@ -1,19 +1,21 @@
 package org.guppy4j.web.html;
 
 /**
- * Enumeration of all valid HTML5 elements, based on the
+ * Enumeration of all valid HTML5 tag, based on the
  * <a href="https://developer.mozilla.org/en/docs/HTML/HTML5/HTML5_element_list">
  * HTML5 element list</a> at developer.mozilla.org.
  */
-public enum ElementNames {
+public enum Element {
 
     /* Root element */
 
     /**
-     * Root of an HTML or XHTML document. All other elements
+     * Root of an HTML or XHTML document. All other tag
      * must be descendants of this element.
      */
     html,
+
+    body,
 
     /* Document metadata */
 
@@ -24,7 +26,7 @@ public enum ElementNames {
     head,
     /**
      * Title of the document, typically shown in browser as window and tab
-     * title. It can only contain text, contained tags are not interpreted.
+     * title. It can only contain text, contained tag are not interpreted.
      */
     title,
     /**
@@ -36,7 +38,7 @@ public enum ElementNames {
      */
     link,
     /**
-     * Defines metadata that cannot be defined using other elements
+     * Defines metadata that cannot be defined using other tag
      */
     meta,
     /**
@@ -73,8 +75,8 @@ Represents the main content of an HTML document. There is only one <body> elemen
 <nav> This element has been added in HTML5 	Defines a section that contains only navigation links
 <article> This element has been added in HTML5 	Defines self-contained content that could exist independantly of the rest of the content
 <aside> This element has been added in HTML5 	Defines some content set aside from the rest of page content. If it is removed, the remaining content still make sense.
-<h1>,<h2>,<h3>,<h4>,<h5>,<h6> 	Heading elements implement six levels of document headings, <h1> is the most important and <h6> is the least. A heading element briefly describes the topic of the section it introduces.
-<hgroup> This element has been added in HTML5 	Groups a set of <h1> to <h6> elements when a heading has multiple levels
+<h1>,<h2>,<h3>,<h4>,<h5>,<h6> 	Heading tag implement six levels of document headings, <h1> is the most important and <h6> is the least. A heading element briefly describes the topic of the section it introduces.
+<hgroup> This element has been added in HTML5 	Groups a set of <h1> to <h6> tag when a heading has multiple levels
 <header> This element has been added in HTML5 	Defines the header of a page or section. It often contains a logo, the title of the Web site and a navigational table of content.
 <footer> This element has been added in HTML5 	Defines the footer for a page or section. It often contains a copyright notice, some links to legal information or addresses to give feedback.
 <address> 	Defines a section containing contact information.
@@ -85,7 +87,7 @@ Element 	Description
 <hr> 	Represents a thematic break between paragraphs of a section or article or any longer content.
 <pre> 	Indicates that its content is preformatted and that this format must be preserved.
 <blockquote> 	Represents a citation.
-<ol> 	Defines an ordered list of items, that is a list which change its meaning if we change the order of its elements
+<ol> 	Defines an ordered list of items, that is a list which change its meaning if we change the order of its tag
 <ul> 	Defines an unordered list of items.
 <li> 	Defines a item of a enumeration list often preceded by a bullet in English.
 <dl> 	Defines a definition list, that is a list of terms and their associated definitions.
@@ -121,7 +123,7 @@ Element 	Description
 <rp> This element has been added in HTML5 	Represents parenthesis around a ruby annotation, used to display the annotation in an alternate way by browsers not supporting the standard display for annotations.
 <bdi> This element has been added in HTML5 	Represents text that must be isolated from its surrounding for bidirectional text formatting. It allows to embed span of text with a different, or unknown, directionality.
 <bdo> 	Represents the directionality of its children, in order to explicitly override the Unicode bidirectional algorithm.
-<span> 	Represents text with no specific meaning. This has to be used when no other text-semantic element conveys an adequate meaning, which, in this case, is often brought by global attributes like class, lang, or dir.
+<span> 	Represents text with no specific meaning. This has to be used when no other text-semantic element conveys an adequate meaning, which, in this case, is often brought by global attribute like class, lang, or dir.
 <br> 	Represents a line break.
 <wbr> This element has been added in HTML5 	Represents a line break opportunity, that is a suggested wrapping point in order to improve readability of text split on several lines.
 Edits
@@ -134,11 +136,11 @@ Element 	Description
 <iframe> 	Represents a nested browsing context, that is an embedded HTML document.
 <embed> This element has been added in HTML5 	Represents a integration point for an external, often non_HTML, application or interactive content.
 <object> 	Represents an external resource, which will be treated as an image, an HTML sub-document or an external resource to be processed by a plugin.
-<param> 	Defines parameters for use by plugins invoked by <object> elements.
+<param> 	Defines parameters for use by plugins invoked by <object> tag.
 <video> This element has been added in HTML5 	Represents a video, and its associated audio files and captions, with the necessary interface to play it.
 <audio> This element has been added in HTML5 	Represents a sound, or an audio stream.
-<source> This element has been added in HTML5 	Allows authors to specify alternative media resources for media elements like <video> or <audio>.
-<track> This element has been added in HTML5 	Allows authors to specify timed text track for media elements like <video> or <audio>.
+<source> This element has been added in HTML5 	Allows authors to specify alternative media resources for media tag like <video> or <audio>.
+<track> This element has been added in HTML5 	Allows authors to specify timed text track for media tag like <video> or <audio>.
 <canvas> This element has been added in HTML5 	Represents a bitmap area that scripts can be used to render graphics, like graphs, game graphics, any visual images on the fly.
 <map> 	In conjunction with <area>, defines an image map.
 <area> 	In conjunction with <map>, defines an image map.
@@ -173,7 +175,7 @@ Element 	Description
 <output> This element has been added in HTML5 	Represents the result of a calculation.
 <progress> This element has been added in HTML5 	Represents the completion progress of a task.
 <meter> This element has been added in HTML5 	Represents a scalar measurement (or a fractional value), within a known range
-Interactive elements
+Interactive tag
 Element 	Description
 <details> This element has been added in HTML5 	Represents a widget from which the user can obtain additional information or controls.
 <summary> This element has been added in HTML5 	Represents a summary, caption, or legend for a given <details>.

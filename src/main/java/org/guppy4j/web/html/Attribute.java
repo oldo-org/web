@@ -1,7 +1,11 @@
 package org.guppy4j.web.html;
 
 /**
- * TODO: Document this
+ * Typed name/value pair
  */
-public interface Attribute {
+public interface Attribute<V> {
+
+    String name();
+
+    V value();
 }
