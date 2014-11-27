@@ -9,19 +9,20 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 /**
- * Tag creation using method names
+ * Mix-in methods for Tag creation using method names
  * that match the HTML5 tag names
  */
-public class TagFactory {
-    public static Html html(List<? extends HtmlAttribute> attributes, Head head, Body body) {
+public interface TagFactory {
+
+    default Html html(List<? extends HtmlAttribute> attributes, Head head, Body body) {
         return new Html(attributes, head, body);
     }
 
-    public static Head head(HeadContent... contents) {
+    default Head head(HeadContent... contents) {
         return new Head(null, asList(contents));
     }
 
-    public static Body body(BodyContent... contents) {
+    default Body body(BodyContent... contents) {
         return new Body(null, asList(contents));
     }
 }

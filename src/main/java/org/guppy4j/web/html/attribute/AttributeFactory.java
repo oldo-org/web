@@ -7,16 +7,16 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 /**
- * Attribute creation using method names
+ * Mix-in methods for attribute creation using method names
  * that match the HTML5 attribute names
  */
-public class AttributeFactory {
+public interface AttributeFactory {
 
-    public static Lang lang(LanguageCode value) {
+    default Lang lang(LanguageCode value) {
         return new Lang(value);
     }
 
-    public static <T> List<T> $(T... attributes) {
+    default <T> List<T> $(T... attributes) {
         return asList(attributes);
     }
 }
