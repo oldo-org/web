@@ -15,30 +15,26 @@ public class LogicFactory {
 
     @SafeVarargs
     public static <M, I, CM extends Content<M>> CM forEach(
-        Function<M, Iterable<I>> items,
-        Function<M, Variable<I>> holder,
-        Class<? super CM> contentType,
-        CM... contents) {
+            Function<M, Iterable<I>> items,
+            Function<M, Variable<I>> holder,
+            Class<? super CM> contentType,
+            CM... contents) {
 
-        if (contents.length > 0) {
-            final InvocationHandler handler = (proxy, method, args) -> {
-                final Renderer renderer = (Renderer) args[0];
-                final M model = (M) args[1];
-                for (I item : items.apply(model)) {
-                    holder.apply(model).set(item);
-                    for (CM content : contents) {
-                        content.render(renderer, model);
-                    }
+        final InvocationHandler handler = (proxy, method, args) -> {
+            final Renderer renderer = (Renderer) args[0];
+            final M model = (M) args[1];
+            for (I item : items.apply(model)) {
+                holder.apply(model).set(item);
+                for (CM content : contents) {
+                    content.render(renderer, model);
                 }
-                return null;
-            };
-
-            return (CM) Proxy.newProxyInstance(contentType.getClassLoader(),
-                new Class[]{contentType},
-                handler);
-
-        } else {
+            }
             return null;
-        }
+        };
+
+        final Object proxy = Proxy.newProxyInstance(contentType.getClassLoader(),
+                new Class[]{contentType}, handler);
+
+        return (CM) proxy;
     }
 }
