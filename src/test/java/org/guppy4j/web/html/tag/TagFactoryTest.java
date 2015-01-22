@@ -52,8 +52,15 @@ public class TagFactoryTest {
 
         final StringBuilder sb = new StringBuilder();
         final Renderer renderer = new AppendingRenderer(sb);
+        final Model model = createTestModel();
 
-        html.render(renderer, new Model() {
+        html.render(renderer, model);
+
+        System.out.print(sb);
+    }
+
+    private Model createTestModel() {
+        return new Model() {
 
             private final Variable<String> name = new VariableImpl<>();
 
@@ -76,9 +83,6 @@ public class TagFactoryTest {
             public Variable<String> name() {
                 return name;
             }
-        });
-
-        System.out.print(sb);
-
+        };
     }
 }
