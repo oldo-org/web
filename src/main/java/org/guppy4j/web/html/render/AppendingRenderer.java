@@ -1,6 +1,6 @@
 package org.guppy4j.web.html.render;
 
-import java.io.IOException;
+import static org.guppy4j.web.html.logic.Functions.tryTo;
 
 /**
  * Renders by appending to an Appendable
@@ -14,20 +14,12 @@ public class AppendingRenderer implements Renderer {
     }
 
     @Override
-    public void render(String s) {
-        try {
-            a.append(s);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public void render(final String s) {
+        tryTo(() -> a.append(s));
     }
 
     @Override
-    public void render(char c) {
-        try {
-            a.append(c);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public void render(final char c) {
+        tryTo(() -> a.append(c));
     }
 }
