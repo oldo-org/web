@@ -2,5 +2,5 @@ package org.guppy4j.web.html.marker;
 
 import org.guppy4j.web.html.Content;
 
-public interface HeadContent extends Content {
+public interface HeadContent<M> extends Content<M> {
 }

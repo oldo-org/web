@@ -3,6 +3,7 @@ package org.guppy4j.web.html.attribute;
 import org.guppy4j.web.html.attribute.type.LanguageCode;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static java.util.Arrays.asList;
 
@@ -12,10 +13,11 @@ import static java.util.Arrays.asList;
  */
 public class AttributeFactory {
 
-    public static Lang lang(LanguageCode value) {
-        return new Lang(value);
+    public static <M> Lang<M> lang(Function<M, LanguageCode> value) {
+        return new Lang<>(value);
     }
 
+    @SafeVarargs
     public static <T> List<T> $(T... attributes) {
         return asList(attributes);
     }

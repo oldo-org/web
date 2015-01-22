@@ -1,4 +1,4 @@
-package org.guppy4j.web.html;
+package org.guppy4j.web.html.tag;
 
 /**
  * Enumeration of all valid HTML5 tag, based on the
@@ -65,7 +65,7 @@ public enum Element {
     nav,
     article,
     aside,
-    h1,h2,h3,h4,h5,h6
+    h1, h2, h3, h4, h5, span, h6
 
 /*
 Element 	Description

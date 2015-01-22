@@ -4,14 +4,15 @@ import org.guppy4j.web.html.marker.HeadAttribute;
 import org.guppy4j.web.html.marker.HeadContent;
 import org.guppy4j.web.html.marker.HtmlContent;
 
-import static org.guppy4j.web.html.Element.head;
+import static org.guppy4j.web.html.tag.Element.head;
 
 /**
  * "head" tag
  */
-public class Head extends Tag<HeadAttribute<?>, HeadContent> implements HtmlContent {
+public class Head<M> extends Tag<M, HeadAttribute<M>, HeadContent<M>> implements HtmlContent<M> {
 
-    public Head(Iterable<HeadAttribute<?>> attributes, Iterable<HeadContent> contents) {
+    public Head(Iterable<HeadAttribute<M>> attributes,
+                Iterable<HeadContent<M>> contents) {
         super(head, attributes, contents);
     }
 }

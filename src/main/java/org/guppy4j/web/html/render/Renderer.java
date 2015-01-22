@@ -7,4 +7,6 @@ public interface Renderer {
 
     void render(String s);
 
+    void render(char c);
+
 }

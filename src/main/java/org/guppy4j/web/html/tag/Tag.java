@@ -1,15 +1,14 @@
 package org.guppy4j.web.html.tag;
 
-import org.guppy4j.web.html.Attribute;
 import org.guppy4j.web.html.Content;
-import org.guppy4j.web.html.Element;
+import org.guppy4j.web.html.attribute.Attribute;
 import org.guppy4j.web.html.render.Renderable;
 import org.guppy4j.web.html.render.Renderer;
 
 /**
  * Tag base class
  */
-public class Tag<A extends Attribute, C extends Content> implements Renderable {
+public class Tag<M, A extends Attribute<M>, C extends Content<M>> implements Renderable<M> {
 
     private final Element element;
     private final Iterable<? extends A> attributes;
@@ -24,36 +23,28 @@ public class Tag<A extends Attribute, C extends Content> implements Renderable {
     }
 
     @Override
-    public final void render(Renderer renderer) {
-        renderer.render(opening());
+    public final void render(Renderer r, M m) {
+        open(r, m);
         if (contents != null) {
             for (C content : contents) {
-                content.render(renderer);
+                content.render(r, m);
             }
         }
-        renderer.render(closing());
+        close(r);
     }
 
-    private String opening() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append('<');
-        sb.append(element);
+    private void open(Renderer r, M m) {
+        r.render('<');
+        r.render(element.name());
         if (attributes != null) {
             for (A attribute : attributes) {
-                sb.append(' ');
-                sb.append(attribute.name());
-                sb.append('=');
-                sb.append('"');
-                sb.append(attribute.value().toString());
-                sb.append('"');
+                attribute.render(r, m);
             }
         }
-        sb.append(' ');
-        sb.append('>');
-        return sb.toString();
+        r.render('>');
     }
 
-    private String closing() {
-        return "</" + element + ">";
+    private void close(Renderer r) {
+        r.render("</" + element + ">");
     }
 }
