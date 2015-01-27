@@ -11,14 +11,14 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static org.guppy4j.web.html.attribute.AttributeFactory.$;
 import static org.guppy4j.web.html.attribute.AttributeFactory.lang;
+import static org.guppy4j.web.html.attribute.AttributeFactory.with;
 import static org.guppy4j.web.html.logic.LogicFactory.forEach;
+import static org.guppy4j.web.html.tag.TagFactory.$;
 import static org.guppy4j.web.html.tag.TagFactory.body;
 import static org.guppy4j.web.html.tag.TagFactory.head;
 import static org.guppy4j.web.html.tag.TagFactory.html;
 import static org.guppy4j.web.html.tag.TagFactory.span;
-import static org.guppy4j.web.html.tag.TagFactory.text;
 import static org.guppy4j.web.html.tag.TagFactory.title;
 
 /**
@@ -33,21 +33,20 @@ public class FactoryTest {
 
         final Html<Model> html =
 
-            html(
-                $(lang(Model::lang)),
+            html(with(lang(Model::lang)),
                 head(
                     title(
-                        text(Model::title),
-                        text(" : "),
+                        $(Model::title),
+                        $(" : "),
                         forEach(Model::names, Model::name,
-                            text(name)
+                            $(name)
                         )
                     )
                 ),
                 body(
                     span(
-                        text(Model::title),
-                        text(" !")
+                        $(Model::title),
+                        $(" !")
                     )
                 )
             );

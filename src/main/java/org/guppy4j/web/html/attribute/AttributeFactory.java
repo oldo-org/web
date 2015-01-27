@@ -18,7 +18,7 @@ public class AttributeFactory {
     }
 
     @SafeVarargs
-    public static <T> List<T> $(T... attributes) {
+    public static <T> List<T> with(T... attributes) {
         return asList(attributes);
     }
 }

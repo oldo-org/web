@@ -43,11 +43,11 @@ public class TagFactory {
         return new Title<>(null, asList(contents));
     }
 
-    public static <M> Text<M> text(String value) {
+    public static <M> Text<M> $(String value) {
         return new Text<>(is(value));
     }
 
-    public static <M> Text<M> text(Function<M, String> value) {
+    public static <M> Text<M> $(Function<M, String> value) {
         return new Text<>(value);
     }
 }
