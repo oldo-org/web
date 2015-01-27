@@ -22,9 +22,9 @@ import static org.guppy4j.web.html.tag.TagFactory.text;
 import static org.guppy4j.web.html.tag.TagFactory.title;
 
 /**
- * TODO: Document this!
+ * Tests factory methods in combination
  */
-public class TagFactoryTest {
+public class FactoryTest {
 
     @Test
     public void test() {
