@@ -1,6 +1,5 @@
 package org.guppy4j.web.html.logic;
 
-import java.io.IOException;
 import java.util.function.Function;
 
 /**
@@ -12,10 +11,12 @@ public class Functions {
         return m -> value;
     }
 
-    public static void tryTo(DoSomething<IOException> ds) {
+    public static <E extends Exception> void tryTo(DoSomething<E> ds) {
         try {
             ds.doIt();
-        } catch (IOException e) {
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }

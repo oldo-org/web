@@ -1,7 +1,6 @@
 package org.guppy4j.web.html.tag;
 
 import org.guppy4j.web.html.attribute.type.LanguageCode;
-import org.guppy4j.web.html.marker.BodyContent;
 import org.guppy4j.web.html.model.Variable;
 import org.guppy4j.web.html.model.VariableImpl;
 import org.guppy4j.web.html.render.AppendingRenderer;
@@ -37,15 +36,18 @@ public class TagFactoryTest {
             html(
                 $(lang(Model::lang)),
                 head(
-                    title(text(Model::title))
-                ),
-                body(
-                    forEach(Model::names, Model::name, BodyContent.class,
-                        span(
-                            text(name),
-                            text(" "),
+                    title(
+                        text(Model::title),
+                        text(" : "),
+                        forEach(Model::names, Model::name,
                             text(name)
                         )
+                    )
+                ),
+                body(
+                    span(
+                        text(Model::title),
+                        text(" !")
                     )
                 )
             );
