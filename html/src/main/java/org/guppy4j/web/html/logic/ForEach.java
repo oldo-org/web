@@ -33,5 +33,7 @@ public class ForEach<M, I, CM extends Content<M>> implements AnyContent<M> {
                 content.render(renderer, model);
             }
         }
+        // clear the loop variable
+        holder.apply(model).set(null);
     }
 }

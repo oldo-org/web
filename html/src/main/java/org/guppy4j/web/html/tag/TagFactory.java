@@ -1,11 +1,13 @@
 package org.guppy4j.web.html.tag;
 
 import org.guppy4j.web.html.content.Text;
+import org.guppy4j.web.html.logic.Mapping;
 import org.guppy4j.web.html.marker.BodyContent;
 import org.guppy4j.web.html.marker.HeadContent;
 import org.guppy4j.web.html.marker.HtmlAttribute;
 import org.guppy4j.web.html.marker.SpanContent;
 import org.guppy4j.web.html.marker.TitleContent;
+import org.guppy4j.web.html.model.Variable;
 
 import java.util.function.Function;
 
@@ -48,6 +50,10 @@ public class TagFactory {
     }
 
     public static <M> Text<M> $(Function<M, String> value) {
+        return new Text<>(value);
+    }
+
+    public static <M> Text<M> $(Mapping<M, Variable<?>> value) {
         return new Text<>(value);
     }
 }

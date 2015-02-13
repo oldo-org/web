@@ -9,7 +9,6 @@ import org.guppy4j.web.samples.Model;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.function.Function;
 
 import static org.guppy4j.web.html.attribute.AttributeFactory.lang;
 import static org.guppy4j.web.html.attribute.AttributeFactory.with;
@@ -24,12 +23,12 @@ import static org.guppy4j.web.html.tag.TagFactory.title;
 /**
  * Tests factory methods in combination
  */
-public class FactoryTest {
+public class RenderTest {
 
     @Test
     public void test() {
 
-        final Function<Model, String> name = m -> m.name().get();
+//        final Function<Model, String> name = m -> m.name().get();
 
         final Html<Model> html =
 
@@ -39,7 +38,7 @@ public class FactoryTest {
                         $(Model::title),
                         $(" : "),
                         forEach(Model::names, Model::name,
-                            $(name)
+                                $(Model::name)
                         )
                     )
                 ),
