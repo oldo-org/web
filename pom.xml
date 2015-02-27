@@ -33,7 +33,7 @@
     <modules>
         <module>html</module>
         <module>css</module>
-        <module>httpd</module>
+        <module>http</module>
     </modules>
 
     <licenses>
