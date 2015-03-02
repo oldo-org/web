@@ -1,11 +1,11 @@
 package org.guppy4j.web.http.files;
 
-import org.guppy4j.web.http.server.Server;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import static org.guppy4j.web.http.util.ConnectionUtil.safeClose;
 
 /**
  * Default strategy for creating and cleaning up temporary files.
@@ -29,7 +29,7 @@ public class DefaultTempFile implements TempFile {
 
     @Override
     public void delete() throws Exception {
-        Server.safeClose(fstream);
+        safeClose(fstream);
         file.delete();
     }
 

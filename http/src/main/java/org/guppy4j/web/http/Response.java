@@ -15,6 +15,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static org.guppy4j.web.http.util.ConnectionUtil.safeClose;
+
 /**
  * HTTP response. Return one of these from serve().
  */
@@ -88,15 +90,15 @@ public class Response {
      * Sends given response to the socket.
      */
     protected void send(OutputStream outputStream) {
-        String mime = mimeType;
-        SimpleDateFormat gmtFrmt = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+        final String mime = mimeType;
+        final SimpleDateFormat gmtFrmt = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
         gmtFrmt.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         try {
             if (status == null) {
                 throw new Error("sendResponse(): Status can't be null.");
             }
-            PrintWriter pw = new PrintWriter(outputStream);
+            final PrintWriter pw = new PrintWriter(outputStream);
             pw.print("HTTP/1.1 " + status.getDescription() + " \r\n");
 
             if (mime != null) {
@@ -126,7 +128,7 @@ public class Response {
                 sendAsFixedLength(outputStream, pending);
             }
             outputStream.flush();
-            Server.safeClose(data);
+            safeClose(data);
         } catch (IOException ioe) {
             // Couldn't write? No can do.
         }

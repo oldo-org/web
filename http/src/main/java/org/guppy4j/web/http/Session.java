@@ -28,12 +28,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import static org.guppy4j.web.http.util.ConnectionUtil.safeClose;
+
 /**
  * TODO: Document this briefly
  */
 public class Session implements ISession {
 
     public static final int BUFSIZE = 8192;
+
     private final TempFileManager tempFileManager;
     private final OutputStream outputStream;
     private PushbackInputStream inputStream;
@@ -57,7 +60,7 @@ public class Session implements ISession {
         this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
         this.outputStream = outputStream;
         String remoteIp = inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress() ? "127.0.0.1" : inetAddress.getHostAddress().toString();
-        headers = new HashMap<String, String>();
+        headers = new HashMap<>();
 
         headers.put("remote-addr", remoteIp);
         headers.put("http-client-ip", remoteIp);
@@ -74,19 +77,19 @@ public class Session implements ISession {
             splitbyte = 0;
             rlen = 0;
             {
-                int read = -1;
+                int read;
                 try {
                     read = inputStream.read(buf, 0, BUFSIZE);
                 } catch (Exception e) {
-                    Server.safeClose(inputStream);
-                    Server.safeClose(outputStream);
-                    throw new SocketException("NanoHttpd Shutdown");
+                    safeClose(inputStream);
+                    safeClose(outputStream);
+                    throw new SocketException("HttpServer Shutdown");
                 }
                 if (read == -1) {
-                    // socket was been closed
-                    Server.safeClose(inputStream);
-                    Server.safeClose(outputStream);
-                    throw new SocketException("NanoHttpd Shutdown");
+                    // socket has been closed
+                    safeClose(inputStream);
+                    safeClose(outputStream);
+                    throw new SocketException("HttpServer Shutdown");
                 }
                 while (read > 0) {
                     rlen += read;
@@ -101,16 +104,16 @@ public class Session implements ISession {
                 inputStream.unread(buf, splitbyte, rlen - splitbyte);
             }
 
-            parms = new HashMap<String, String>();
+            parms = new HashMap<>();
             if (null == headers) {
-                headers = new HashMap<String, String>();
+                headers = new HashMap<>();
             }
 
             // Create a BufferedReader for parsing the header.
             BufferedReader hin = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(buf, 0, rlen)));
 
             // Decode the header into parms and header java properties
-            Map<String, String> pre = new HashMap<String, String>();
+            Map<String, String> pre = new HashMap<>();
             decodeHeader(hin, pre, parms, headers);
 
             method = Method.lookup(pre.get("method"));
@@ -139,11 +142,11 @@ public class Session implements ISession {
         } catch (IOException ioe) {
             Response r = new Response(Status.INTERNAL_ERROR, Server.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
             r.send(outputStream);
-            Server.safeClose(outputStream);
+            safeClose(outputStream);
         } catch (ResponseException re) {
             Response r = new Response(re.getStatus(), Server.MIME_PLAINTEXT, re.getMessage());
             r.send(outputStream);
-            Server.safeClose(outputStream);
+            safeClose(outputStream);
         } finally {
             tempFileManager.clear();
         }
@@ -235,8 +238,8 @@ public class Session implements ISession {
                 files.put("content", saveTmpFile(fbuf, 0, fbuf.limit()));
             }
         } finally {
-            Server.safeClose(randomAccessFile);
-            Server.safeClose(in);
+            safeClose(randomAccessFile);
+            safeClose(in);
         }
     }
 
@@ -430,7 +433,7 @@ public class Session implements ISession {
             } catch (Exception e) { // Catch exception if any
                 throw new Error(e); // we won't recover, so throw an error
             } finally {
-                Server.safeClose(fileOutputStream);
+                safeClose(fileOutputStream);
             }
         }
         return path;

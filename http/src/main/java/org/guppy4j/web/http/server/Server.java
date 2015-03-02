@@ -11,7 +11,6 @@ import org.guppy4j.web.http.files.TempFileManager;
 import org.guppy4j.web.http.files.TempFileManagerFactory;
 import org.guppy4j.web.http.util.UriUtil;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.guppy4j.web.http.util.ConnectionUtil.safeClose;
 
 /**
  * A tiny embeddable HTTP server
@@ -49,7 +50,7 @@ public class Server implements IDaemon, IServer {
     /**
      * Pseudo-Parameter to use to store the actual query string in the parameters map for later re-processing.
      */
-    private static final String QUERY_STRING_PARAMETER = "NanoHttpd.QUERY_STRING";
+    private static final String QUERY_STRING_PARAMETER = "HttpServer.QUERY_STRING";
 
     private final String hostname;
     private final int myPort;
@@ -89,16 +90,6 @@ public class Server implements IDaemon, IServer {
         setTempFileManagerFactory(new DefaultTempFileManagerFactory());
     }
 
-    public static void safeClose(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException e) {
-                // nothing we can do
-            }
-        }
-    }
-
     /**
      * Start the server.
      *
@@ -132,7 +123,7 @@ public class Server implements IDaemon, IServer {
                                 } catch (Exception e) {
                                     // When the socket is closed by the client, we throw our own SocketException
                                     // to break the  "keep alive" loop above.
-                                    if (!(e instanceof SocketException && "NanoHttpd Shutdown".equals(e.getMessage()))) {
+                                    if (!(e instanceof SocketException && "HttpServer Shutdown".equals(e.getMessage()))) {
                                         e.printStackTrace();
                                     }
                                 } finally {
@@ -149,7 +140,7 @@ public class Server implements IDaemon, IServer {
             }
         });
         myThread.setDaemon(true);
-        myThread.setName("NanoHttpd Main Listener");
+        myThread.setName("HttpServer Main Listener");
         myThread.start();
     }
 
@@ -219,8 +210,8 @@ public class Server implements IDaemon, IServer {
      */
     @Override
     public Response serve(ISession session) {
-        Map<String, String> files = new HashMap<String, String>();
-        Method method = session.getMethod();
+        final Map<String, String> files = new HashMap<>();
+        final Method method = session.getMethod();
         if (Method.PUT.equals(method) || Method.POST.equals(method)) {
             try {
                 session.parseBody(files);
@@ -231,7 +222,7 @@ public class Server implements IDaemon, IServer {
             }
         }
 
-        Map<String, String> parms = session.getParms();
+        final Map<String, String> parms = session.getParms();
         parms.put(QUERY_STRING_PARAMETER, session.getQueryParameterString());
         return new Response(Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found");
     }
@@ -241,7 +232,7 @@ public class Server implements IDaemon, IServer {
      * supplied several times, by return lists of values.  In general these lists will contain a single
      * element.
      *
-     * @param parms original <b>NanoHttpd</b> parameters values, as passed to the <code>serve()</code> method.
+     * @param parms original <b>HttpServer</b> parameters values, as passed to the <code>serve()</code> method.
      * @return a map of <code>String</code> (parameter name) to <code>List&lt;String&gt;</code> (a list of the values supplied).
      */
     public Map<String, List<String>> decodeParameters(Map<String, String> parms) {
