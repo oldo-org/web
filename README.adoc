@@ -31,10 +31,10 @@ link="https://travis-ci.org/guppy4j/web"]
 == Related libraries/frameworks
 
 Projects I am reviewing for ideas:
-- https://github.com/caelum/vraptor
-- https://github.com/luiz/vraptor-html-dsl
-- http://code.google.com/p/jatl/
-- https://github.com/emicklei/rendersnake
-- http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/package-summary.html
-- https://github.com/corgrath/Java-CSS-Library
-- https://code.google.com/p/phloc-css/
+* https://github.com/caelum/vraptor
+* https://github.com/luiz/vraptor-html-dsl
+* http://code.google.com/p/jatl/
+* https://github.com/emicklei/rendersnake
+* http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/package-summary.html
+* https://github.com/corgrath/Java-CSS-Library
+* https://code.google.com/p/phloc-css/
