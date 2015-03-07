@@ -1,10 +1,18 @@
-guppy4j / web
-=============
+= guppy4j / web
 
 Pure Java web framework
 
-Requirements
-------------
+== Releases
+
+No releases yet. 
+This project is in alpha status.
+
+== Build status
+
+image:https://travis-ci.org/guppy4j/web.svg?branch=master[
+link="https://travis-ci.org/guppy4j/web"]
+
+== Requirements
 
 - Allow MVC and component style web development in pure Java
 - No HTML, CSS, JSP, XML or properties files
@@ -20,11 +28,10 @@ Requirements
 - Use interfaces and immutable objects wherever possible
 - TBD: JavaScript / Ajax support
 
-
-Related libraries/frameworks
-----------------------------
+== Related libraries/frameworks
 
 Projects I am reviewing for ideas:
+
 - https://github.com/caelum/vraptor
 - https://github.com/luiz/vraptor-html-dsl
 - http://code.google.com/p/jatl/
