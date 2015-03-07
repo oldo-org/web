@@ -11,34 +11,21 @@ import org.junit.Test;
 import static java.util.Arrays.asList;
 import static org.guppy4j.web.html.attribute.AttributeFactory.lang;
 import static org.guppy4j.web.html.attribute.AttributeFactory.with;
+import static org.guppy4j.web.html.content.Text.$;
 import static org.guppy4j.web.html.logic.LogicFactory.forEach;
-import static org.guppy4j.web.html.tag.TagFactory.$;
-import static org.guppy4j.web.html.tag.TagFactory.body;
-import static org.guppy4j.web.html.tag.TagFactory.head;
-import static org.guppy4j.web.html.tag.TagFactory.html;
-import static org.guppy4j.web.html.tag.TagFactory.span;
-import static org.guppy4j.web.html.tag.TagFactory.title;
+import static org.guppy4j.web.html.tag.Body.body;
+import static org.guppy4j.web.html.tag.Head.head;
+import static org.guppy4j.web.html.tag.Html.html;
+import static org.guppy4j.web.html.tag.Span.span;
+import static org.guppy4j.web.html.tag.Title.title;
 
 /**
  * Tests factory methods in combination
  */
 public class RenderTest {
 
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testMissingTitleCheck() {
-        html(head(), body());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSingleTitleCheck() {
-        html(head(title(), title()), body());
-    }
-
     @Test
     public void test() {
-
-//        final Function<Model, String> name = m -> m.name().get();
 
         final Html<Model> html =
 
