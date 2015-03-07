@@ -5,6 +5,8 @@ import org.guppy4j.web.html.attribute.Attribute;
 import org.guppy4j.web.html.render.Renderable;
 import org.guppy4j.web.html.render.Renderer;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Tag base class
  */
@@ -17,6 +19,9 @@ public class Tag<M, A extends Attribute<M>, C extends Content<M>> implements Ren
     public Tag(Element element,
                Iterable<? extends A> attributes,
                Iterable<? extends C> contents) {
+        requireNonNull(element, "element");
+        requireNonNull(attributes, "attributes");
+        requireNonNull(contents, "contents");
         this.element = element;
         this.attributes = attributes;
         this.contents = contents;

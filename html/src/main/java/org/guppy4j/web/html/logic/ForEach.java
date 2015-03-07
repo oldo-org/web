@@ -27,13 +27,14 @@ public class ForEach<M, I, CM extends Content<M>> implements AnyContent<M> {
 
     @Override
     public void render(Renderer renderer, M model) {
+        final Variable<I> var = holder.apply(model);
         for (I item : items.apply(model)) {
-            holder.apply(model).set(item);
+            var.set(item);
             for (CM content : contents) {
                 content.render(renderer, model);
             }
         }
         // clear the loop variable
-        holder.apply(model).set(null);
+        var.set(null);
     }
 }

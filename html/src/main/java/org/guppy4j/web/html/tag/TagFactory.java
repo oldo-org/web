@@ -12,6 +12,7 @@ import org.guppy4j.web.html.model.Variable;
 import java.util.function.Function;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.guppy4j.web.html.logic.Functions.is;
 
 /**
@@ -25,24 +26,28 @@ public class TagFactory {
         return new Html<>(attributes, head, body);
     }
 
+    public static <M> Html<M> html(Head<M> head, Body<M> body) {
+        return new Html<>(emptyList(), head, body);
+    }
+
     @SafeVarargs
     public static <M> Head<M> head(HeadContent<M>... contents) {
-        return new Head<>(null, asList(contents));
+        return new Head<>(emptyList(), asList(contents));
     }
 
     @SafeVarargs
     public static <M> Span<M> span(SpanContent<M>... contents) {
-        return new Span<>(null, asList(contents));
+        return new Span<>(emptyList(), asList(contents));
     }
 
     @SafeVarargs
     public static <M> Body<M> body(BodyContent<M>... contents) {
-        return new Body<>(null, asList(contents));
+        return new Body<>(emptyList(), asList(contents));
     }
 
     @SafeVarargs
     public static <M> Title<M> title(TitleContent<M>... contents) {
-        return new Title<>(null, asList(contents));
+        return new Title<>(emptyList(), asList(contents));
     }
 
     public static <M> Text<M> $(String value) {

@@ -11,4 +11,12 @@
 
     <artifactId>html</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.guppy4j</groupId>
+            <artifactId>static</artifactId>
+            <version>0.0.3</version>
+        </dependency>
+    </dependencies>
+
 </project>

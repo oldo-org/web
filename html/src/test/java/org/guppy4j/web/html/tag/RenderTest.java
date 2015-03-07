@@ -8,8 +8,7 @@ import org.guppy4j.web.html.render.Renderer;
 import org.guppy4j.web.samples.Model;
 import org.junit.Test;
 
-import java.util.Arrays;
-
+import static java.util.Arrays.asList;
 import static org.guppy4j.web.html.attribute.AttributeFactory.lang;
 import static org.guppy4j.web.html.attribute.AttributeFactory.with;
 import static org.guppy4j.web.html.logic.LogicFactory.forEach;
@@ -25,6 +24,17 @@ import static org.guppy4j.web.html.tag.TagFactory.title;
  */
 public class RenderTest {
 
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMissingTitleCheck() {
+        html(head(), body());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSingleTitleCheck() {
+        html(head(title(), title()), body());
+    }
+
     @Test
     public void test() {
 
@@ -35,17 +45,15 @@ public class RenderTest {
             html(with(lang(Model::lang)),
                 head(
                     title(
-                        $(Model::title),
-                        $(" : "),
-                        forEach(Model::names, Model::name,
-                                $(Model::name)
-                        )
+                        $(Model::title)
                     )
                 ),
                 body(
-                    span(
-                        $(Model::title),
-                        $(" !")
+                    forEach(Model::names, Model::name,
+                        span(
+                            $(Model::name),
+                            $(" !")
+                        )
                     )
                 )
             );
@@ -76,7 +84,7 @@ public class RenderTest {
 
             @Override
             public Iterable<String> names() {
-                return Arrays.asList("a", "b", "c");
+                return asList("a", "b", "c");
             }
 
             @Override

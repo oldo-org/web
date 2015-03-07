@@ -4,6 +4,8 @@ import org.guppy4j.web.html.marker.HeadAttribute;
 import org.guppy4j.web.html.marker.HeadContent;
 import org.guppy4j.web.html.marker.HtmlContent;
 
+import static org.guppy4j.Checks.requireEqual;
+import static org.guppy4j.Iterables.stream;
 import static org.guppy4j.web.html.tag.Element.head;
 
 /**
@@ -14,5 +16,12 @@ public class Head<M> extends Tag<M, HeadAttribute<M>, HeadContent<M>> implements
     public Head(Iterable<HeadAttribute<M>> attributes,
                 Iterable<HeadContent<M>> contents) {
         super(head, attributes, contents);
+        checkTitle(contents);
     }
+
+    private void checkTitle(Iterable<HeadContent<M>> contents) {
+        final long titleCount = stream(contents).filter(HeadContent::isTitle).count();
+        requireEqual(1L, titleCount, "Invalid number of title elements");
+    }
+
 }
