@@ -1,7 +1,4 @@
-package org.guppy4j.web.http.files;
-
-import org.guppy4j.web.http.ISession;
-import org.guppy4j.web.http.Response;
+package org.guppy4j.web.http;
 
 import java.io.File;
 import java.util.Map;
@@ -17,5 +14,5 @@ public interface FileServerPlugin {
     boolean canServeUri(String uri, File rootDir);
 
     Response serveFile(String uri, Map<String, String> headers,
-                       ISession session, File file, String mimeType);
+                       IRequest request, File file, String mimeType);
 }

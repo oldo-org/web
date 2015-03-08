@@ -1,9 +1,9 @@
-package org.guppy4j.web.http.server;
+package org.guppy4j.web.http;
 
 import java.io.IOException;
 
 /**
- * TODO: Document this briefly
+ * A daemon process can be started and stopped
  */
 public interface IDaemon {
 
@@ -11,4 +11,5 @@ public interface IDaemon {
 
     void stop();
 
+    boolean wasStarted();
 }

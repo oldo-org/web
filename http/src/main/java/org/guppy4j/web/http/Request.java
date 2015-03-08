@@ -1,9 +1,7 @@
 package org.guppy4j.web.http;
 
-import org.guppy4j.web.http.files.TempFile;
-import org.guppy4j.web.http.files.TempFileManager;
-import org.guppy4j.web.http.server.IServer;
-import org.guppy4j.web.http.server.Server;
+import org.guppy4j.web.http.io.TempFile;
+import org.guppy4j.web.http.io.TempFileManager;
 import org.guppy4j.web.http.util.UriUtil;
 
 import java.io.BufferedReader;
@@ -28,12 +26,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import static org.guppy4j.web.http.util.ConnectionUtil.safeClose;
+import static org.guppy4j.web.http.util.ConnectionUtil.close;
 
 /**
  * TODO: Document this briefly
  */
-public class Session implements ISession {
+public class Request implements IRequest {
 
     public static final int BUFSIZE = 8192;
 
@@ -49,13 +47,13 @@ public class Session implements ISession {
     private CookieHandler cookies;
     private String queryParameterString;
 
-    public Session(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream) {
+    public Request(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream) {
         this.tempFileManager = tempFileManager;
         this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
         this.outputStream = outputStream;
     }
 
-    public Session(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream, InetAddress inetAddress) {
+    public Request(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream, InetAddress inetAddress) {
         this.tempFileManager = tempFileManager;
         this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
         this.outputStream = outputStream;
@@ -81,14 +79,14 @@ public class Session implements ISession {
                 try {
                     read = inputStream.read(buf, 0, BUFSIZE);
                 } catch (Exception e) {
-                    safeClose(inputStream);
-                    safeClose(outputStream);
+                    close(inputStream);
+                    close(outputStream);
                     throw new SocketException("HttpServer Shutdown");
                 }
                 if (read == -1) {
                     // socket has been closed
-                    safeClose(inputStream);
-                    safeClose(outputStream);
+                    close(inputStream);
+                    close(outputStream);
                     throw new SocketException("HttpServer Shutdown");
                 }
                 while (read > 0) {
@@ -140,13 +138,13 @@ public class Session implements ISession {
         } catch (SocketTimeoutException ste) {
             throw ste;
         } catch (IOException ioe) {
-            Response r = new Response(Status.INTERNAL_ERROR, Server.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
+            Response r = new Response(Status.INTERNAL_ERROR, ServerDaemon.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
             r.send(outputStream);
-            safeClose(outputStream);
+            close(outputStream);
         } catch (ResponseException re) {
-            Response r = new Response(re.getStatus(), Server.MIME_PLAINTEXT, re.getMessage());
+            Response r = new Response(re.getStatus(), ServerDaemon.MIME_PLAINTEXT, re.getMessage());
             r.send(outputStream);
-            safeClose(outputStream);
+            close(outputStream);
         } finally {
             tempFileManager.clear();
         }
@@ -230,7 +228,7 @@ public class Session implements ISession {
                     if ("application/x-www-form-urlencoded".equalsIgnoreCase(contentType)) {
                         decodeParms(postLine, parms);
                     } else if (postLine.length() != 0) {
-                        // Special case for raw POST data => create a special files entry "postData" with raw content data
+                        // Special case for raw POST data => create a special io entry "postData" with raw content data
                         files.put("postData", postLine);
                     }
                 }
@@ -238,8 +236,8 @@ public class Session implements ISession {
                 files.put("content", saveTmpFile(fbuf, 0, fbuf.limit()));
             }
         } finally {
-            safeClose(randomAccessFile);
-            safeClose(in);
+            close(randomAccessFile);
+            close(in);
         }
     }
 
@@ -433,7 +431,7 @@ public class Session implements ISession {
             } catch (Exception e) { // Catch exception if any
                 throw new Error(e); // we won't recover, so throw an error
             } finally {
-                safeClose(fileOutputStream);
+                close(fileOutputStream);
             }
         }
         return path;

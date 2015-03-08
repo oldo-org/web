@@ -1,4 +1,4 @@
-package org.guppy4j.web.http.files;
+package org.guppy4j.web.http;
 
 import org.guppy4j.web.http.util.UriUtil;
 
@@ -10,7 +10,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 /**
- * TODO: Document this briefly
+ * Lists directory content as HTML
  */
 public class DirectoryListing {
 
@@ -60,7 +60,7 @@ public class DirectoryListing {
                 msg.append("</section>");
             }
             if (files.size() > 0) {
-                msg.append("<section class=\"files\">");
+                msg.append("<section class=\"io\">");
                 for (String file : files) {
                     msg.append("<li><a href=\"").append(UriUtil.encodeUri(uri + file)).append("\"><span class=\"filename\">").append(file).append("</span></a>");
                     File curFile = new File(f, file);

@@ -1,7 +1,5 @@
 package org.guppy4j.web.http;
 
-import org.guppy4j.web.http.server.IServer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -9,7 +7,7 @@ import java.util.Map;
 /**
  * Handles one session, i.e. parses the HTTP request and returns the response.
  */
-public interface ISession {
+public interface IRequest {
 
     void execute(IServer server) throws IOException;
 
@@ -33,7 +31,7 @@ public interface ISession {
     /**
      * Adds the files in the request body to the files map.
      *
-     * @arg files - map to modify
+     * @param files Map to modify
      */
     void parseBody(Map<String, String> files) throws IOException, ResponseException;
 }

@@ -1,4 +1,4 @@
-package org.guppy4j.web.http.server;
+package org.guppy4j.web.http;
 
 /**
  * Default threading strategy for HttpServer.
@@ -7,11 +7,11 @@ package org.guppy4j.web.http.server;
  * to <i>daemon</i> status, and named according to the request number.  The name is
  * useful when profiling the application.</p>
  */
-public class DefaultAsyncRunner implements AsyncRunner {
+public class DefaultRequestExecutor implements RequestExecutor {
     private long requestCount;
 
     @Override
-    public void exec(Runnable code) {
+    public void execute(Runnable code) {
         ++requestCount;
         Thread t = new Thread(code);
         t.setDaemon(true);

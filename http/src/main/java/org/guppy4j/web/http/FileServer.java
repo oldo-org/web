@@ -1,11 +1,4 @@
-package org.guppy4j.web.http.files;
-
-import org.guppy4j.web.http.ISession;
-import org.guppy4j.web.http.InternalRewrite;
-import org.guppy4j.web.http.Response;
-import org.guppy4j.web.http.Status;
-import org.guppy4j.web.http.server.Server;
-import org.guppy4j.web.http.server.ServerRunner;
+package org.guppy4j.web.http;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,11 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ServiceLoader;
 
 import static java.util.Arrays.asList;
 
-public class FileServer extends Server {
+public class FileServer implements IServer {
     /**
      * Common mime type for dynamic content: binary
      */
@@ -30,7 +22,7 @@ public class FileServer extends Server {
     /**
      * Default Index file names.
      */
-    private static final List<String> INDEX_FILE_NAMES = new ArrayList<String>() {{
+    private final List<String> indexFileNames = new ArrayList<String>() {{
         add("index.html");
         add("index.htm");
     }};
@@ -38,7 +30,7 @@ public class FileServer extends Server {
     /**
      * Hashtable mapping (String)FILENAME_EXTENSION -> (String)MIME_TYPE
      */
-    private static final Map<String, String> MIME_TYPES = new HashMap<String, String>() {{
+    private final Map<String, String> mimeTypes = new HashMap<String, String>() {{
         put("css", "text/css");
         put("htm", "text/html");
         put("html", "text/html");
@@ -67,16 +59,16 @@ public class FileServer extends Server {
         put("class", MIME_DEFAULT_BINARY);
     }};
 
-    private static Map<String, FileServerPlugin> mimeTypeHandlers = new HashMap<String, FileServerPlugin>();
+    private final Map<String, FileServerPlugin> mimeTypeHandlers = new HashMap<>();
+
     private final Iterable<File> rootDirs;
     private final boolean quiet;
 
-    public FileServer(String host, int port, boolean quiet, File... rootDirs) {
-        this(host, port, quiet, asList(rootDirs));
+    public FileServer(boolean quiet, File... rootDirs) {
+        this(quiet, asList(rootDirs));
     }
 
-    public FileServer(String host, int port, boolean quiet, Iterable<File> rootDirs) {
-        super(host, port);
+    public FileServer(boolean quiet, Iterable<File> rootDirs) {
         this.quiet = quiet;
         this.rootDirs = rootDirs;
         init();
@@ -88,81 +80,7 @@ public class FileServer extends Server {
     public void init() {
     }
 
-    /**
-     * Starts as a standalone file server and waits for Enter.
-     */
-    public static void main(String[] args) {
-        // Defaults
-        int port = 8080;
-        String host = "127.0.0.1";
-
-        final List<File> rootDirs = new ArrayList<File>();
-        boolean quiet = false;
-        final Map<String, String> options = new HashMap<String, String>();
-
-        // Parse command-line, with short and long versions of the options.
-        for (int i = 0; i < args.length; ++i) {
-            if (args[i].equalsIgnoreCase("-h") || args[i].equalsIgnoreCase("--host")) {
-                host = args[i + 1];
-            } else if (args[i].equalsIgnoreCase("-p") || args[i].equalsIgnoreCase("--port")) {
-                port = Integer.parseInt(args[i + 1]);
-            } else if (args[i].equalsIgnoreCase("-q") || args[i].equalsIgnoreCase("--quiet")) {
-                quiet = true;
-            } else if (args[i].equalsIgnoreCase("-d") || args[i].equalsIgnoreCase("--dir")) {
-                rootDirs.add(new File(args[i + 1]).getAbsoluteFile());
-            } else if (args[i].startsWith("-X:")) {
-                int dot = args[i].indexOf('=');
-                if (dot > 0) {
-                    String name = args[i].substring(0, dot);
-                    String value = args[i].substring(dot + 1, args[i].length());
-                    options.put(name, value);
-                }
-            }
-        }
-
-        if (rootDirs.isEmpty()) {
-            rootDirs.add(new File(".").getAbsoluteFile());
-        }
-
-        options.put("host", host);
-        options.put("port", "" + port);
-        options.put("quiet", String.valueOf(quiet));
-        final StringBuilder sb = new StringBuilder();
-        for (File dir : rootDirs) {
-            if (sb.length() > 0) {
-                sb.append(":");
-            }
-            try {
-                sb.append(dir.getCanonicalPath());
-            } catch (IOException ignored) {
-            }
-        }
-        options.put("home", sb.toString());
-
-        final ServiceLoader<FileServerPluginInfo> serviceLoader =
-                ServiceLoader.load(FileServerPluginInfo.class);
-
-        for (FileServerPluginInfo info : serviceLoader) {
-            for (String mime : info.getMimeTypes()) {
-                final String[] indexFiles = info.getIndexFilesForMimeType(mime);
-                if (!quiet) {
-                    System.out.print("# Found plugin for Mime type: \"" + mime + "\"");
-                    if (indexFiles != null) {
-                        System.out.print(" (serving index files: ");
-                        for (String indexFile : indexFiles) {
-                            System.out.print(indexFile + " ");
-                        }
-                    }
-                    System.out.println(").");
-                }
-                registerPluginForMimeType(indexFiles, mime, info.getWebServerPlugin(mime), options);
-            }
-        }
-
-        ServerRunner.executeInstance(new FileServer(host, port, quiet, rootDirs));
-    }
-
-    protected static void registerPluginForMimeType(String[] indexFiles, String mimeType,
+    public void registerPluginForMimeType(String[] indexFiles, String mimeType,
                                                     FileServerPlugin plugin,
                                                     Map<String, String> commandLineOptions) {
         if (mimeType == null || plugin == null) {
@@ -174,10 +92,10 @@ public class FileServer extends Server {
                 int dot = filename.lastIndexOf('.');
                 if (dot >= 0) {
                     String extension = filename.substring(dot + 1).toLowerCase();
-                    MIME_TYPES.put(extension, mimeType);
+                    mimeTypes.put(extension, mimeType);
                 }
             }
-            INDEX_FILE_NAMES.addAll(asList(indexFiles));
+            indexFileNames.addAll(asList(indexFiles));
         }
         mimeTypeHandlers.put(mimeType, plugin);
         plugin.initialize(commandLineOptions);
@@ -191,13 +109,14 @@ public class FileServer extends Server {
         return rootDirs;
     }
 
-    public Response serve(ISession session) {
-        final Map<String, String> headers = session.getHeaders();
-        final Map<String, String> params = session.getParms();
-        final String uri = session.getUri();
+    @Override
+    public Response serve(IRequest request) {
+        final Map<String, String> headers = request.getHeaders();
+        final Map<String, String> params = request.getParms();
+        final String uri = request.getUri();
 
         if (!quiet) {
-            System.out.println(session.getMethod() + " '" + uri + "' ");
+            System.out.println(request.getMethod() + " '" + uri + "' ");
 
             for (Entry<String, String> e : headers.entrySet()) {
                 System.out.println("  HDR: '" + e.getKey() + "' = '" + e.getValue() + "'");
@@ -213,10 +132,10 @@ public class FileServer extends Server {
                 return getInternalErrorResponse("given path is not a directory (" + homeDir + ").");
             }
         }
-        return respond(Collections.unmodifiableMap(headers), session, uri);
+        return respond(Collections.unmodifiableMap(headers), request, uri);
     }
 
-    private Response respond(Map<String, String> headers, ISession session, final String query) {
+    private Response respond(Map<String, String> headers, IRequest session, final String query) {
         // Remove URL arguments
         final String normalizedQuery = query.trim().replace(File.separatorChar, '/');
         final String uri = normalizedQuery.indexOf('?') >= 0
@@ -237,7 +156,7 @@ public class FileServer extends Server {
         final File f = new File(homeDir, uri);
         if (f.isDirectory() && !uri.endsWith("/")) {
             final String redirectUri = uri + "/";
-            final Response res = createResponse(Status.REDIRECT, Server.MIME_HTML,
+            final Response res = createResponse(Status.REDIRECT, ServerDaemon.MIME_HTML,
                     "<html><body>Redirected: " +
                             "<a href=\"" + redirectUri + "\">" + redirectUri + "</a>" +
                             "</body></html>");
@@ -246,12 +165,12 @@ public class FileServer extends Server {
         }
 
         if (f.isDirectory()) {
-            // First look for index files (index.html, index.htm, etc) and if none found, list the directory if readable.
+            // First look for index io (index.html, index.htm, etc) and if none found, list the directory if readable.
             final String indexFile = findIndexFileInDirectory(f);
             if (indexFile == null) {
                 if (f.canRead()) {
                     // No index file, list the directory if it is readable
-                    return createResponse(Status.OK, Server.MIME_HTML, DirectoryListing.listDirectory(normalizedQuery, f));
+                    return createResponse(Status.OK, ServerDaemon.MIME_HTML, DirectoryListing.listDirectory(normalizedQuery, f));
                 } else {
                     return getForbiddenResponse("No directory listing.");
                 }
@@ -283,18 +202,18 @@ public class FileServer extends Server {
         return null;
     }
 
-    protected Response getNotFoundResponse() {
-        return createResponse(Status.NOT_FOUND, Server.MIME_PLAINTEXT,
+    private Response getNotFoundResponse() {
+        return createResponse(Status.NOT_FOUND, ServerDaemon.MIME_PLAINTEXT,
                 "Error 404, file not found.");
     }
 
-    protected Response getForbiddenResponse(String s) {
-        return createResponse(Status.FORBIDDEN, Server.MIME_PLAINTEXT, "FORBIDDEN: "
+    private Response getForbiddenResponse(String s) {
+        return createResponse(Status.FORBIDDEN, ServerDaemon.MIME_PLAINTEXT, "FORBIDDEN: "
                 + s);
     }
 
-    protected Response getInternalErrorResponse(String s) {
-        return createResponse(Status.INTERNAL_ERROR, Server.MIME_PLAINTEXT,
+    private Response getInternalErrorResponse(String s) {
+        return createResponse(Status.INTERNAL_ERROR, ServerDaemon.MIME_PLAINTEXT,
                 "INTERNAL ERRROR: " + s);
     }
 
@@ -312,7 +231,7 @@ public class FileServer extends Server {
      * Serves file from homeDir and its' subdirectories (only). Uses only URI,
      * ignores all headers and HTTP parameters.
      */
-    Response serveFile(String uri, Map<String, String> header, File file, String mime) {
+    private Response serveFile(String uri, Map<String, String> header, File file, String mime) {
         Response res;
         try {
             // Calculate etag
@@ -341,7 +260,7 @@ public class FileServer extends Server {
             long fileLen = file.length();
             if (range != null && startFrom >= 0) {
                 if (startFrom >= fileLen) {
-                    res = createResponse(Status.RANGE_NOT_SATISFIABLE, Server.MIME_PLAINTEXT, "");
+                    res = createResponse(Status.RANGE_NOT_SATISFIABLE, ServerDaemon.MIME_PLAINTEXT, "");
                     res.addHeader("Content-Range", "bytes 0-0/" + fileLen);
                     res.addHeader("ETag", etag);
                 } else {
@@ -386,7 +305,7 @@ public class FileServer extends Server {
     private String getMimeTypeForFile(String uri) {
         final int dot = uri.lastIndexOf('.');
         return dot >= 0
-                ? MIME_TYPES.get(uri.substring(dot + 1).toLowerCase())
+            ? mimeTypes.get(uri.substring(dot + 1).toLowerCase())
                 : MIME_DEFAULT_BINARY;
     }
 
@@ -405,7 +324,7 @@ public class FileServer extends Server {
     }
 
     private String findIndexFileInDirectory(File directory) {
-        for (String fileName : INDEX_FILE_NAMES) {
+        for (String fileName : indexFileNames) {
             if (new File(directory, fileName).exists()) {
                 return fileName;
             }

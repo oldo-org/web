@@ -7,13 +7,17 @@ import java.io.IOException;
  * TODO: Document this!
  */
 public class ConnectionUtil {
-    public static void safeClose(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException e) {
-                // nothing we can do
+
+    public static void close(Closeable... closeables) {
+        for (Closeable c : closeables) {
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (IOException e) {
+                    // nothing we can do
+                }
             }
         }
     }
+
 }

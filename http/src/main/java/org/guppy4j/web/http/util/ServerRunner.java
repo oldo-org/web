@@ -1,10 +1,12 @@
-package org.guppy4j.web.http.server;
+package org.guppy4j.web.http.util;
+
+import org.guppy4j.web.http.ServerDaemon;
 
 import java.io.IOException;
 
 public class ServerRunner {
 
-    public static void run(Class<? extends Server> serverClass) {
+    public static void run(Class<? extends ServerDaemon> serverClass) {
         try {
             executeInstance(serverClass.newInstance());
         } catch (Exception e) {
@@ -12,9 +14,9 @@ public class ServerRunner {
         }
     }
 
-    public static void executeInstance(Server server) {
+    public static void executeInstance(ServerDaemon serverDaemon) {
         try {
-            server.start();
+            serverDaemon.start();
         } catch (IOException ioe) {
             System.err.println("Couldn't start server:\n" + ioe);
             System.exit(-1);
@@ -27,7 +29,7 @@ public class ServerRunner {
         } catch (Throwable ignored) {
         }
 
-        server.stop();
+        serverDaemon.stop();
         System.out.println("Server stopped.\n");
     }
 }

@@ -1,7 +1,7 @@
-package org.guppy4j.web.http.files;
+package org.guppy4j.web.http.io;
 
 /**
- * Default strategy for creating and cleaning up temporary files.
+ * Default strategy for creating and cleaning up temporary io.
  */
 public class DefaultTempFileManagerFactory implements TempFileManagerFactory {
     @Override

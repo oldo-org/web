@@ -1,7 +1,5 @@
 package org.guppy4j.web.http;
 
-import org.guppy4j.web.http.server.Server;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static org.guppy4j.web.http.util.ConnectionUtil.safeClose;
+import static org.guppy4j.web.http.util.ConnectionUtil.close;
 
 /**
  * HTTP response. Return one of these from serve().
@@ -50,7 +48,7 @@ public class Response {
      * Default constructor: response = HTTP_OK, mime = MIME_HTML and your supplied message
      */
     public Response(String msg) {
-        this(Status.OK, Server.MIME_HTML, msg);
+        this(Status.OK, ServerDaemon.MIME_HTML, msg);
     }
 
     /**
@@ -128,7 +126,7 @@ public class Response {
                 sendAsFixedLength(outputStream, pending);
             }
             outputStream.flush();
-            safeClose(data);
+            close(data);
         } catch (IOException ioe) {
             // Couldn't write? No can do.
         }
