@@ -1,12 +1,15 @@
-package org.guppy4j.web.http.io;
+package org.guppy4j.web.http;
+
+import org.guppy4j.web.TempFile;
+import org.guppy4j.web.TempFileManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Default strategy for creating and cleaning up temporary io.
+ * Default strategy for creating and cleaning up temporary files.
  * <p/>
- * <p></p>This class stores its io in the standard location (that is,
+ * <p></p>This class stores its files in the standard location (that is,
  * wherever <code>java.io.tmpdir</code> points to).  Files are added
  * to an internal list, and deleted when no longer needed (that is,
  * when <code>clear()</code> is invoked at the end of processing a

@@ -48,7 +48,7 @@ public class Response {
      * Default constructor: response = HTTP_OK, mime = MIME_HTML and your supplied message
      */
     public Response(String msg) {
-        this(Status.OK, ServerDaemon.MIME_HTML, msg);
+        this(Status.OK, IServer.MIME_HTML, msg);
     }
 
     /**

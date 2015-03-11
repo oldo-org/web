@@ -13,7 +13,8 @@ import static org.guppy4j.web.html.tag.Element.head;
 /**
  * "head" tag
  */
-public class Head<M> extends Tag<M, HeadAttribute<M>, HeadContent<M>> implements HtmlContent<M> {
+public class Head<M> extends Tag<M, HeadAttribute<M>, HeadContent<M>>
+        implements HtmlContent<M> {
 
     @SafeVarargs
     public static <M> Head<M> head(HeadContent<M>... contents) {
@@ -30,5 +31,4 @@ public class Head<M> extends Tag<M, HeadAttribute<M>, HeadContent<M>> implements
         final long titleCount = stream(contents).filter(HeadContent::isTitle).count();
         requireEqual(1L, titleCount, "Invalid number of title elements");
     }
-
 }

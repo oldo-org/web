@@ -1,8 +1,8 @@
 package org.guppy4j.web.http;
 
-import org.guppy4j.web.http.io.DefaultTempFileManagerFactory;
-import org.guppy4j.web.http.io.TempFileManager;
-import org.guppy4j.web.http.io.TempFileManagerFactory;
+import org.guppy4j.web.http.tempfiles.DefaultTempFilesFactory;
+import org.guppy4j.web.http.tempfiles.TempFiles;
+import org.guppy4j.web.http.tempfiles.TempFilesFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +17,7 @@ import static org.guppy4j.web.http.util.ConnectionUtil.close;
 /**
  * A tiny embeddable HTTP server daemon
  */
-public final class ServerDaemon implements IDaemon, IServer, IPortListener {
+public final class ServerDaemon implements IDaemon, IPortListener {
 
     /**
      * Maximum time to wait on Socket.getInputStream().read() (in milliseconds)
@@ -26,21 +26,19 @@ public final class ServerDaemon implements IDaemon, IServer, IPortListener {
      */
     private static final int SOCKET_READ_TIMEOUT = 5000;
 
-    private final String hostname;
-    private final int port;
-
-    private final RequestExecutor executor;
+    private final InetSocketAddress address;
+    private final ServerSocket serverSocket;
 
     private final Connections connections = new Connections();
-    private final IServer server;
 
-    private ServerSocket serverSocket;
-    private Thread serverThread;
+    private final RequestExecutor executor;
+    private final IServer server;
+    private final Thread serverThread;
 
     /**
      * Pluggable strategy for creating and cleaning up temporary io.
      */
-    private final TempFileManagerFactory tempFileManagerFactory;
+    private final TempFilesFactory tempFilesFactory;
 
     /**
      * Constructs an HTTP server on given port on localhost.
@@ -52,18 +50,23 @@ public final class ServerDaemon implements IDaemon, IServer, IPortListener {
     /**
      * Constructs an HTTP server on given hostname and port.
      */
-    public ServerDaemon(String hostname, int port, IServer server) {
+    public ServerDaemon(String hostname, int port,
+                        IServer server) {
         this(hostname, port, server, new DefaultRequestExecutor());
     }
 
-    public ServerDaemon(String hostname, int port, IServer server, RequestExecutor executor) {
-        this.hostname = hostname;
-        this.port = port;
+    public ServerDaemon(String hostname, int port,
+                        IServer server, RequestExecutor executor) {
+        this.tempFilesFactory = new DefaultTempFilesFactory();
         this.executor = executor;
         this.server = server;
-        this.tempFileManagerFactory = new DefaultTempFileManagerFactory();
+        serverSocket = createServerSocket();
+        address = getSocketAddress(hostname, port);
+        serverThread = createServerThread(this::run);
     }
 
+    /* *** Interface methods *** */
+    
     /**
      * Start the server.
      *
@@ -71,71 +74,9 @@ public final class ServerDaemon implements IDaemon, IServer, IPortListener {
      */
     @Override
     public void start() throws IOException {
-        this.serverSocket = bindServerSocket();
-        this.serverThread = createServerThread(this::run);
+        serverSocket.bind(address);
+        serverThread.start();
     }
-
-    private void run() {
-        do {
-            try {
-                final Socket socket = acceptSocket(serverSocket);
-                final InputStream in = socket.getInputStream();
-                executor.execute(() -> {
-                    try (OutputStream out = socket.getOutputStream()) {
-                        executeSession(socket, in, out);
-                    } catch (IOException e) {
-                        handle(e);
-                    } finally {
-                        close(in, socket);
-                        connections.remove(socket);
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } while (!serverSocket.isClosed());
-    }
-
-    private void executeSession(Socket socket, InputStream in, OutputStream out) throws IOException {
-        final TempFileManager tempFileManager = tempFileManagerFactory.create();
-        final Request session = new Request(tempFileManager, in, out, socket.getInetAddress());
-        while (!socket.isClosed()) {
-            session.execute(server);
-        }
-    }
-
-    private void handle(IOException e) {
-        // When the socket is closed by the client, we throw our own SocketException
-        // to break the  "keep alive" loop above.
-        if (!(e instanceof SocketException && "HttpServer Shutdown".equals(e.getMessage()))) {
-            e.printStackTrace();
-        }
-    }
-
-    private Socket acceptSocket(ServerSocket ss) throws IOException {
-        final Socket socket = ss.accept();
-        connections.add(socket);
-        socket.setSoTimeout(SOCKET_READ_TIMEOUT);
-        return socket;
-    }
-
-    private ServerSocket bindServerSocket() throws IOException {
-        final ServerSocket ss = new ServerSocket();
-        final InetSocketAddress address = (hostname != null)
-            ? new InetSocketAddress(hostname, port)
-            : new InetSocketAddress(port);
-        ss.bind(address);
-        return ss;
-    }
-
-    private Thread createServerThread(Runnable runnable) {
-        final Thread t = new Thread(runnable);
-        t.setDaemon(true);
-        t.setName("HttpServer Main Listener");
-        t.start();
-        return t;
-    }
-
 
     /**
      * Stop the server.
@@ -168,18 +109,72 @@ public final class ServerDaemon implements IDaemon, IServer, IPortListener {
         return wasStarted() && !serverSocket.isClosed() && serverThread.isAlive();
     }
 
-    /**
-     * Override this to customize the server.
-     * <p>
-     * <p>
-     * (By default, this delegates to serveFile() and allows directory listing.)
-     *
-     * @param request The HTTP session
-     * @return HTTP response, see class Response for details
-     */
-    @Override
-    public Response serve(IRequest request) {
-        return server.serve(request);
+    /* Execution */
+
+    private void run() {
+        do {
+            try {
+                final Socket socket = acceptSocket(serverSocket, connections);
+                final InputStream in = socket.getInputStream();
+                executor.execute(() -> {
+                    try (OutputStream out = socket.getOutputStream()) {
+                        handleRequest(socket, in, out);
+                    } catch (IOException e) {
+                        handleException(e);
+                    } finally {
+                        close(in, socket);
+                        connections.remove(socket);
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } while (!serverSocket.isClosed());
     }
 
+    private void handleRequest(Socket socket, InputStream in, OutputStream out)
+            throws IOException {
+        final TempFiles tempFiles = tempFilesFactory.create();
+        final Request request = new Request(tempFiles, in, out, socket.getInetAddress());
+        while (!socket.isClosed()) {
+            request.handleBy(server);
+        }
+    }
+
+    private static void handleException(IOException e) {
+        // When the socket is closed by the client, we throw our own SocketException
+        // to break the  "keep alive" loop above.
+        if (!(e instanceof SocketException && "HttpServer Shutdown".equals(e.getMessage()))) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Socket acceptSocket(ServerSocket serverSocket, Connections connections)
+            throws IOException {
+        final Socket socket = serverSocket.accept();
+        connections.add(socket);
+        socket.setSoTimeout(SOCKET_READ_TIMEOUT);
+        return socket;
+    }
+
+    private static InetSocketAddress getSocketAddress(String hostname, int port) {
+        return (hostname != null)
+            ? new InetSocketAddress(hostname, port)
+            : new InetSocketAddress(port);
+    }
+
+    private static ServerSocket createServerSocket() {
+        try {
+            return new ServerSocket();
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not create ServerSocket", e);
+        }
+    }
+
+    private static Thread createServerThread(Runnable runnable) {
+        final Thread thread = new Thread(runnable);
+        thread.setDaemon(true);
+        thread.setName("HttpServer Main Listener");
+        return thread;
+    }
 }

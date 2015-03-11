@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static java.util.Arrays.asList;
+import static org.guppy4j.web.http.DirectoryListing.listDirectory;
 
 public class FileServer implements IServer {
     /**
@@ -156,7 +157,7 @@ public class FileServer implements IServer {
         final File f = new File(homeDir, uri);
         if (f.isDirectory() && !uri.endsWith("/")) {
             final String redirectUri = uri + "/";
-            final Response res = createResponse(Status.REDIRECT, ServerDaemon.MIME_HTML,
+            final Response res = createResponse(Status.REDIRECT, MIME_HTML,
                     "<html><body>Redirected: " +
                             "<a href=\"" + redirectUri + "\">" + redirectUri + "</a>" +
                             "</body></html>");
@@ -170,7 +171,7 @@ public class FileServer implements IServer {
             if (indexFile == null) {
                 if (f.canRead()) {
                     // No index file, list the directory if it is readable
-                    return createResponse(Status.OK, ServerDaemon.MIME_HTML, DirectoryListing.listDirectory(normalizedQuery, f));
+                    return createResponse(Status.OK, MIME_HTML, listDirectory(normalizedQuery, f));
                 } else {
                     return getForbiddenResponse("No directory listing.");
                 }
@@ -188,7 +189,7 @@ public class FileServer implements IServer {
                 return respond(rewrite.getHeaders(), session, rewrite.getUri());
             }
         } else {
-            response = serveFile(normalizedQuery, headers, f, mimeTypeForFile);
+            response = serveFile(headers, f, mimeTypeForFile);
         }
         return response != null ? response : getNotFoundResponse();
     }
@@ -203,17 +204,16 @@ public class FileServer implements IServer {
     }
 
     private Response getNotFoundResponse() {
-        return createResponse(Status.NOT_FOUND, ServerDaemon.MIME_PLAINTEXT,
+        return createResponse(Status.NOT_FOUND, MIME_PLAINTEXT,
                 "Error 404, file not found.");
     }
 
-    private Response getForbiddenResponse(String s) {
-        return createResponse(Status.FORBIDDEN, ServerDaemon.MIME_PLAINTEXT, "FORBIDDEN: "
-                + s);
+    private static Response getForbiddenResponse(String s) {
+        return createResponse(Status.FORBIDDEN, MIME_PLAINTEXT, "FORBIDDEN: " + s);
     }
 
     private Response getInternalErrorResponse(String s) {
-        return createResponse(Status.INTERNAL_ERROR, ServerDaemon.MIME_PLAINTEXT,
+        return createResponse(Status.INTERNAL_ERROR, MIME_PLAINTEXT,
                 "INTERNAL ERRROR: " + s);
     }
 
@@ -231,9 +231,9 @@ public class FileServer implements IServer {
      * Serves file from homeDir and its' subdirectories (only). Uses only URI,
      * ignores all headers and HTTP parameters.
      */
-    private Response serveFile(String uri, Map<String, String> header, File file, String mime) {
-        Response res;
+    private static Response serveFile(Map<String, String> header, File file, String mime) {
         try {
+            Response res;
             // Calculate etag
             final String etag = Integer.toHexString(
                     (file.getAbsolutePath() + file.lastModified() + "" + file.length()).hashCode());
@@ -260,7 +260,7 @@ public class FileServer implements IServer {
             long fileLen = file.length();
             if (range != null && startFrom >= 0) {
                 if (startFrom >= fileLen) {
-                    res = createResponse(Status.RANGE_NOT_SATISFIABLE, ServerDaemon.MIME_PLAINTEXT, "");
+                    res = createResponse(Status.RANGE_NOT_SATISFIABLE, MIME_PLAINTEXT, "");
                     res.addHeader("Content-Range", "bytes 0-0/" + fileLen);
                     res.addHeader("ETag", etag);
                 } else {
@@ -295,10 +295,11 @@ public class FileServer implements IServer {
                     res.addHeader("ETag", etag);
                 }
             }
+            return res;
+            
         } catch (IOException ioe) {
-            res = getForbiddenResponse("Reading file failed.");
+            return getForbiddenResponse("Reading file failed.");
         }
-        return res;
     }
 
     // Get MIME type from file name extension, if possible
@@ -310,14 +311,14 @@ public class FileServer implements IServer {
     }
 
     // Announce that the file server accepts partial content requests
-    private Response createResponse(Status status, String mimeType, InputStream message) {
+    private static Response createResponse(Status status, String mimeType, InputStream message) {
         final Response res = new Response(status, mimeType, message);
         res.addHeader("Accept-Ranges", "bytes");
         return res;
     }
 
     // Announce that the file server accepts partial content requests
-    private Response createResponse(Status status, String mimeType, String message) {
+    private static Response createResponse(Status status, String mimeType, String message) {
         final Response res = new Response(status, mimeType, message);
         res.addHeader("Accept-Ranges", "bytes");
         return res;

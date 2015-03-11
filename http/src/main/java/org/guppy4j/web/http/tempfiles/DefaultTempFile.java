@@ -1,4 +1,4 @@
-package org.guppy4j.web.http.io;
+package org.guppy4j.web.http.tempfiles;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,15 +8,15 @@ import java.io.OutputStream;
 import static org.guppy4j.web.http.util.ConnectionUtil.close;
 
 /**
- * Default strategy for creating and cleaning up temporary io.
- * <p/>
- * <p></p></[>By default, io are created by <code>File.createTempFile()</code> in
+ * Default strategy for creating and cleaning up temporary files.
+ * <p>
+ * By default, temp files are created by <code>File.createTempFile()</code> in
  * the directory specified.</p>
  */
 public class DefaultTempFile implements TempFile {
 
-    private File file;
-    private OutputStream stream;
+    private final File file;
+    private final OutputStream stream;
 
     public DefaultTempFile(String tempdir) throws IOException {
         file = File.createTempFile("Daemon-", "", new File(tempdir));

@@ -1,4 +1,4 @@
-package org.guppy4j.web.http.io;
+package org.guppy4j.web.http.tempfiles;
 
 /**
  * Temp file manager.
@@ -6,9 +6,9 @@ package org.guppy4j.web.http.io;
  * <p>Temp file managers are created 1-to-1 with incoming requests, to create and cleanup
  * temporary io created as a result of handling the request.</p>
  */
-public interface TempFileManager {
+public interface TempFiles {
 
-    TempFile createTempFile() throws Exception;
+    TempFile createNew() throws Exception;
 
     void clear();
 }

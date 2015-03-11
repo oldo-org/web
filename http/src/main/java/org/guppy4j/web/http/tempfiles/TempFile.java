@@ -1,4 +1,4 @@
-package org.guppy4j.web.http.io;
+package org.guppy4j.web.http.tempfiles;
 
 import java.io.IOException;
 import java.io.OutputStream;

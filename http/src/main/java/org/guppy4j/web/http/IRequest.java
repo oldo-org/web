@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public interface IRequest {
 
-    void execute(IServer server) throws IOException;
+    void handleBy(IServer server) throws IOException;
 
     Map<String, String> getParms();
 

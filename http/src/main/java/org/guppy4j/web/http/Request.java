@@ -1,7 +1,7 @@
 package org.guppy4j.web.http;
 
-import org.guppy4j.web.http.io.TempFile;
-import org.guppy4j.web.http.io.TempFileManager;
+import org.guppy4j.web.http.tempfiles.TempFile;
+import org.guppy4j.web.http.tempfiles.TempFiles;
 import org.guppy4j.web.http.util.UriUtil;
 
 import java.io.BufferedReader;
@@ -35,7 +35,7 @@ public class Request implements IRequest {
 
     public static final int BUFSIZE = 8192;
 
-    private final TempFileManager tempFileManager;
+    private final TempFiles tempFiles;
     private final OutputStream outputStream;
     private PushbackInputStream inputStream;
     private int splitbyte;
@@ -47,14 +47,14 @@ public class Request implements IRequest {
     private CookieHandler cookies;
     private String queryParameterString;
 
-    public Request(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream) {
-        this.tempFileManager = tempFileManager;
+    public Request(TempFiles tempFiles, InputStream inputStream, OutputStream outputStream) {
+        this.tempFiles = tempFiles;
         this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
         this.outputStream = outputStream;
     }
 
-    public Request(TempFileManager tempFileManager, InputStream inputStream, OutputStream outputStream, InetAddress inetAddress) {
-        this.tempFileManager = tempFileManager;
+    public Request(TempFiles tempFiles, InputStream inputStream, OutputStream outputStream, InetAddress inetAddress) {
+        this.tempFiles = tempFiles;
         this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
         this.outputStream = outputStream;
         String remoteIp = inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress() ? "127.0.0.1" : inetAddress.getHostAddress().toString();
@@ -65,7 +65,7 @@ public class Request implements IRequest {
     }
 
     @Override
-    public void execute(IServer server) throws IOException {
+    public void handleBy(IServer server) throws IOException {
         try {
             // Read the first 8192 bytes.
             // The full header should fit in here.
@@ -138,15 +138,15 @@ public class Request implements IRequest {
         } catch (SocketTimeoutException ste) {
             throw ste;
         } catch (IOException ioe) {
-            Response r = new Response(Status.INTERNAL_ERROR, ServerDaemon.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
+            Response r = new Response(Status.INTERNAL_ERROR, IServer.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
             r.send(outputStream);
             close(outputStream);
         } catch (ResponseException re) {
-            Response r = new Response(re.getStatus(), ServerDaemon.MIME_PLAINTEXT, re.getMessage());
+            Response r = new Response(re.getStatus(), IServer.MIME_PLAINTEXT, re.getMessage());
             r.send(outputStream);
             close(outputStream);
         } finally {
-            tempFileManager.clear();
+            tempFiles.clear();
         }
     }
 
@@ -421,7 +421,7 @@ public class Request implements IRequest {
         if (len > 0) {
             FileOutputStream fileOutputStream = null;
             try {
-                TempFile tempFile = tempFileManager.createTempFile();
+                TempFile tempFile = tempFiles.createNew();
                 ByteBuffer src = b.duplicate();
                 fileOutputStream = new FileOutputStream(tempFile.getName());
                 FileChannel dest = fileOutputStream.getChannel();
@@ -439,7 +439,7 @@ public class Request implements IRequest {
 
     private RandomAccessFile getTmpBucket() {
         try {
-            TempFile tempFile = tempFileManager.createTempFile();
+            TempFile tempFile = tempFiles.createNew();
             return new RandomAccessFile(tempFile.getName(), "rw");
         } catch (Exception e) {
             throw new Error(e); // we won't recover, so throw an error
