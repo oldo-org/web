@@ -1,5 +1,7 @@
 package org.guppy4j.web.http;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Default threading strategy for HttpServer.
  * <p/>
@@ -8,14 +10,14 @@ package org.guppy4j.web.http;
  * useful when profiling the application.</p>
  */
 public class DefaultRequestExecutor implements RequestExecutor {
-    private long requestCount;
+
+    private final AtomicLong requestCount = new AtomicLong();
 
     @Override
     public void execute(Runnable code) {
-        ++requestCount;
-        Thread t = new Thread(code);
+        final Thread t = new Thread(code);
         t.setDaemon(true);
-        t.setName("HttpServer Request Processor (#" + requestCount + ")");
+        t.setName("HttpServer Request Processor (#" + requestCount.getAndIncrement() + ")");
         t.start();
     }
 }
