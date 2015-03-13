@@ -1,5 +1,6 @@
-package org.guppy4j.web.http;
+package org.guppy4j.web.http.fs;
 
+import org.guppy4j.web.http.ServerDaemon;
 import org.guppy4j.web.http.util.ServerRunner;
 
 import java.io.File;

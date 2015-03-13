@@ -1,4 +1,4 @@
-package org.guppy4j.web.http;
+package org.guppy4j.web.http.fs;
 
 /**
  * @author Paul S. Hawke (paul.hawke@gmail.com)

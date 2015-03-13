@@ -4,9 +4,13 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * TODO: Document this!
+ * Closes connections and similar objects
  */
-public class ConnectionUtil {
+public final class ConnectionUtil {
+
+    private ConnectionUtil() {
+        // no instances
+    }
 
     public static void close(Closeable... closeables) {
         for (Closeable c : closeables) {

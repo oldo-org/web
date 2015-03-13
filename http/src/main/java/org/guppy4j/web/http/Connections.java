@@ -1,25 +1,27 @@
 package org.guppy4j.web.http;
 
-import java.net.Socket;
-import java.util.HashSet;
-import java.util.Set;
+import org.guppy4j.web.http.util.ConnectionUtil;
 
-import static org.guppy4j.web.http.util.ConnectionUtil.close;
+import java.net.Socket;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static java.util.Collections.newSetFromMap;
 
 /**
  * Manages socket connections
  */
-public class Connections {
+public final class Connections {
 
-    private final Set<Socket> openConnections = new HashSet<>();
+    private final Set<Socket> set = newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * Registers that a new connection has been set up.
      *
      * @param socket the {@link java.net.Socket} for the connection.
      */
-    public synchronized void add(Socket socket) {
-        openConnections.add(socket);
+    public void add(Socket socket) {
+        set.add(socket);
     }
 
     /**
@@ -27,16 +29,14 @@ public class Connections {
      *
      * @param socket the {@link java.net.Socket} for the connection.
      */
-    public synchronized void remove(Socket socket) {
-        openConnections.remove(socket);
+    public void remove(Socket socket) {
+        set.remove(socket);
     }
 
     /**
      * Forcibly closes all connections that are open.
      */
-    public synchronized void closeAll() {
-        for (Socket socket : openConnections) {
-            close(socket);
-        }
+    public void closeAll() {
+        set.stream().forEach(ConnectionUtil::close);
     }
 }

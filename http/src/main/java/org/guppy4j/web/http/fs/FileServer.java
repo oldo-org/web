@@ -1,4 +1,9 @@
-package org.guppy4j.web.http;
+package org.guppy4j.web.http.fs;
+
+import org.guppy4j.web.http.IRequest;
+import org.guppy4j.web.http.IServer;
+import org.guppy4j.web.http.Response;
+import org.guppy4j.web.http.Status;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static java.util.Arrays.asList;
-import static org.guppy4j.web.http.DirectoryListing.listDirectory;
 
 public class FileServer implements IServer {
     /**
@@ -171,7 +175,7 @@ public class FileServer implements IServer {
             if (indexFile == null) {
                 if (f.canRead()) {
                     // No index file, list the directory if it is readable
-                    return createResponse(Status.OK, MIME_HTML, listDirectory(normalizedQuery, f));
+                    return createResponse(Status.OK, MIME_HTML, DirectoryListing.listDirectory(normalizedQuery, f));
                 } else {
                     return getForbiddenResponse("No directory listing.");
                 }
