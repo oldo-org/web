@@ -26,7 +26,7 @@ public interface IRequest {
 
     InputStream getInputStream();
 
-    CookieHandler getCookies();
+    Cookies getCookies();
 
     /**
      * Adds the files in the request body to the files map.

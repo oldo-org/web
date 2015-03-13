@@ -57,7 +57,7 @@ public final class ServerDaemon implements IDaemon, IPortListener {
 
     public ServerDaemon(String hostname, int port,
                         IServer server, RequestExecutor executor) {
-        this.tempFilesFactory = new DefaultTempFilesFactory();
+        tempFilesFactory = new DefaultTempFilesFactory();
         this.executor = executor;
         this.server = server;
         serverSocket = createServerSocket();
@@ -117,14 +117,7 @@ public final class ServerDaemon implements IDaemon, IPortListener {
                 final Socket socket = acceptSocket(serverSocket, connections);
                 final InputStream in = socket.getInputStream();
                 executor.execute(() -> {
-                    try (OutputStream out = socket.getOutputStream()) {
-                        handleRequest(socket, in, out);
-                    } catch (IOException e) {
-                        handleException(e);
-                    } finally {
-                        close(in, socket);
-                        connections.remove(socket);
-                    }
+                    handleRequest(socket, in);
                 });
             } catch (IOException e) {
                 e.printStackTrace();
@@ -132,19 +125,25 @@ public final class ServerDaemon implements IDaemon, IPortListener {
         } while (!serverSocket.isClosed());
     }
 
-    private void handleRequest(Socket socket, InputStream in, OutputStream out)
-            throws IOException {
-        final TempFiles tempFiles = tempFilesFactory.create();
-        final Request request = new Request(tempFiles, in, out, socket.getInetAddress());
-        while (!socket.isClosed()) {
-            request.handleBy(server);
+    private void handleRequest(Socket socket, InputStream in) {
+        try (OutputStream out = socket.getOutputStream()) {
+            final TempFiles tempFiles = tempFilesFactory.create();
+            final IRequest request = new Request(tempFiles, in, out, socket.getInetAddress());
+            while (!socket.isClosed()) {
+                request.handleBy(server);
+            }
+        } catch (IOException e) {
+            handleException(e);
+        } finally {
+            close(in, socket);
+            connections.remove(socket);
         }
     }
 
     private static void handleException(IOException e) {
         // When the socket is closed by the client, we throw our own SocketException
         // to break the  "keep alive" loop above.
-        if (!(e instanceof SocketException && "HttpServer Shutdown".equals(e.getMessage()))) {
+        if (!(e instanceof SocketException && IServer.HTTP_SERVER_SHUTDOWN.equals(e.getMessage()))) {
             e.printStackTrace();
         }
     }

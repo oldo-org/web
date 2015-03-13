@@ -19,6 +19,7 @@ public interface IServer {
      * Pseudo-Parameter to use to store the actual query string in the parameters map for later re-processing.
      */
     String QUERY_STRING_PARAMETER = "HttpServer.QUERY_STRING";
+    String HTTP_SERVER_SHUTDOWN = "HttpServer Shutdown";
 
     /**
      * @param request An HTTP request

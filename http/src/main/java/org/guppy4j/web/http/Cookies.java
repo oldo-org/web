@@ -16,17 +16,16 @@ import java.util.Map;
  *
  * @author LordFokas
  */
-public class CookieHandler implements Iterable<String> {
+public class Cookies implements Iterable<String> {
 
-    private HashMap<String, String> cookies = new HashMap<String, String>();
-    private ArrayList<Cookie> queue = new ArrayList<Cookie>();
+    private HashMap<String, String> cookies = new HashMap<>();
+    private ArrayList<Cookie> queue = new ArrayList<>();
 
-    public CookieHandler(Map<String, String> httpHeaders) {
-        String raw = httpHeaders.get("cookie");
+    public Cookies(Map<String, String> httpHeaders) {
+        final String raw = httpHeaders.get("cookie");
         if (raw != null) {
-            String[] tokens = raw.split(";");
-            for (String token : tokens) {
-                String[] data = token.trim().split("=");
+            for (String token : raw.split(";")) {
+                final String[] data = token.trim().split("=");
                 if (data.length == 2) {
                     cookies.put(data[0], data[1]);
                 }

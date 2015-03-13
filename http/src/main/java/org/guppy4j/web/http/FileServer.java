@@ -184,10 +184,6 @@ public class FileServer implements IServer {
         final Response response;
         if (plugin != null) {
             response = plugin.serveFile(normalizedQuery, headers, session, f, mimeTypeForFile);
-            if (response != null && response instanceof InternalRewrite) {
-                InternalRewrite rewrite = (InternalRewrite) response;
-                return respond(rewrite.getHeaders(), session, rewrite.getUri());
-            }
         } else {
             response = serveFile(headers, f, mimeTypeForFile);
         }
@@ -275,7 +271,7 @@ public class FileServer implements IServer {
                     final long dataLen = newLen;
                     FileInputStream fis = new FileInputStream(file) {
                         @Override
-                        public int available() throws IOException {
+                        public int available() {
                             return (int) dataLen;
                         }
                     };

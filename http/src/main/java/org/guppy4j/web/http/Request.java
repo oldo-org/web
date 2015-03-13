@@ -19,6 +19,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,33 +32,34 @@ import static org.guppy4j.web.http.util.ConnectionUtil.close;
 /**
  * TODO: Document this briefly
  */
-public class Request implements IRequest {
+public final class Request implements IRequest {
 
     public static final int BUFSIZE = 8192;
 
     private final TempFiles tempFiles;
-    private final OutputStream outputStream;
-    private PushbackInputStream inputStream;
+    private final OutputStream out;
+    private final PushbackInputStream in;
+
     private int splitbyte;
     private int rlen;
     private String uri;
     private Method method;
     private Map<String, String> parms;
     private Map<String, String> headers;
-    private CookieHandler cookies;
+    private Cookies cookies;
     private String queryParameterString;
 
-    public Request(TempFiles tempFiles, InputStream inputStream, OutputStream outputStream) {
+    public Request(TempFiles tempFiles, InputStream in, OutputStream out) {
         this.tempFiles = tempFiles;
-        this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
-        this.outputStream = outputStream;
+        this.in = new PushbackInputStream(in, BUFSIZE);
+        this.out = out;
     }
 
-    public Request(TempFiles tempFiles, InputStream inputStream, OutputStream outputStream, InetAddress inetAddress) {
+    public Request(TempFiles tempFiles, InputStream in, OutputStream out, InetAddress inetAddress) {
         this.tempFiles = tempFiles;
-        this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
-        this.outputStream = outputStream;
-        String remoteIp = inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress() ? "127.0.0.1" : inetAddress.getHostAddress().toString();
+        this.in = new PushbackInputStream(in, BUFSIZE);
+        this.out = out;
+        final String remoteIp = inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress() ? "127.0.0.1" : inetAddress.getHostAddress().toString();
         headers = new HashMap<>();
 
         headers.put("remote-addr", remoteIp);
@@ -71,35 +73,33 @@ public class Request implements IRequest {
             // The full header should fit in here.
             // Apache's default header limit is 8KB.
             // Do NOT assume that a single read will get the entire header at once!
-            byte[] buf = new byte[BUFSIZE];
             splitbyte = 0;
             rlen = 0;
-            {
-                int read;
-                try {
-                    read = inputStream.read(buf, 0, BUFSIZE);
-                } catch (Exception e) {
-                    close(inputStream);
-                    close(outputStream);
-                    throw new SocketException("HttpServer Shutdown");
-                }
-                if (read == -1) {
-                    // socket has been closed
-                    close(inputStream);
-                    close(outputStream);
-                    throw new SocketException("HttpServer Shutdown");
-                }
-                while (read > 0) {
-                    rlen += read;
-                    splitbyte = findHeaderEnd(buf, rlen);
-                    if (splitbyte > 0)
-                        break;
-                    read = inputStream.read(buf, rlen, BUFSIZE - rlen);
-                }
+            final byte[] buf = new byte[BUFSIZE];
+            int read;
+            try {
+                read = in.read(buf, 0, BUFSIZE);
+            } catch (IOException e) {
+                close(in);
+                close(out);
+                throw new SocketException(IServer.HTTP_SERVER_SHUTDOWN);
+            }
+            if (read == -1) {
+                // socket has been closed
+                close(in);
+                close(out);
+                throw new SocketException(IServer.HTTP_SERVER_SHUTDOWN);
+            }
+            while (read > 0) {
+                rlen += read;
+                splitbyte = findHeaderEnd(buf, rlen);
+                if (splitbyte > 0)
+                    break;
+                read = in.read(buf, rlen, BUFSIZE - rlen);
             }
 
             if (splitbyte < rlen) {
-                inputStream.unread(buf, splitbyte, rlen - splitbyte);
+                in.unread(buf, splitbyte, rlen - splitbyte);
             }
 
             parms = new HashMap<>();
@@ -108,10 +108,11 @@ public class Request implements IRequest {
             }
 
             // Create a BufferedReader for parsing the header.
-            BufferedReader hin = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(buf, 0, rlen)));
+            final BufferedReader hin = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(buf, 0, rlen)));
 
             // Decode the header into parms and header java properties
-            Map<String, String> pre = new HashMap<>();
+            final Map<String, String> pre = new HashMap<>();
             decodeHeader(hin, pre, parms, headers);
 
             method = Method.lookup(pre.get("method"));
@@ -121,7 +122,7 @@ public class Request implements IRequest {
 
             uri = pre.get("uri");
 
-            cookies = new CookieHandler(headers);
+            cookies = new Cookies(headers);
 
             // Ok, now do the serve()
             Response r = server.serve(this);
@@ -130,21 +131,19 @@ public class Request implements IRequest {
             } else {
                 cookies.unloadQueue(r);
                 r.setRequestMethod(method);
-                r.send(outputStream);
+                r.send(out);
             }
-        } catch (SocketException e) {
+        } catch (SocketException | SocketTimeoutException e) {
             // throw it out to close socket object (finalAccept)
             throw e;
-        } catch (SocketTimeoutException ste) {
-            throw ste;
         } catch (IOException ioe) {
             Response r = new Response(Status.INTERNAL_ERROR, IServer.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
-            r.send(outputStream);
-            close(outputStream);
+            r.send(out);
+            close(out);
         } catch (ResponseException re) {
             Response r = new Response(re.getStatus(), IServer.MIME_PLAINTEXT, re.getMessage());
-            r.send(outputStream);
-            close(outputStream);
+            r.send(out);
+            close(out);
         } finally {
             tempFiles.clear();
         }
@@ -152,11 +151,7 @@ public class Request implements IRequest {
 
     @Override
     public void parseBody(Map<String, String> files) throws IOException, ResponseException {
-        RandomAccessFile randomAccessFile = null;
-        BufferedReader in = null;
-        try {
-
-            randomAccessFile = getTmpBucket();
+        try (RandomAccessFile randomAccessFile = getTmpBucket()) {
 
             long size;
             if (headers.containsKey("content-length")) {
@@ -168,9 +163,9 @@ public class Request implements IRequest {
             }
 
             // Now read all the body and write it to f
-            byte[] buf = new byte[512];
+            final byte[] buf = new byte[512];
             while (rlen >= 0 && size > 0) {
-                rlen = inputStream.read(buf, 0, (int) Math.min(size, 512));
+                rlen = in.read(buf, 0, (int) Math.min(size, 512));
                 size -= rlen;
                 if (rlen > 0) {
                     randomAccessFile.write(buf, 0, rlen);
@@ -178,66 +173,71 @@ public class Request implements IRequest {
             }
 
             // Get the raw body as a byte []
-            ByteBuffer fbuf = randomAccessFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, randomAccessFile.length());
+            final ByteBuffer fbuf = randomAccessFile.getChannel().map(MapMode.READ_ONLY, 0, randomAccessFile.length());
             randomAccessFile.seek(0);
-
-            // Create a BufferedReader for easily reading it as string.
-            InputStream bin = new FileInputStream(randomAccessFile.getFD());
-            in = new BufferedReader(new InputStreamReader(bin));
 
             // If the method is POST, there may be parameters
             // in data section, too, read it:
             if (Method.POST.equals(method)) {
-                String contentType = "";
-                String contentTypeHeader = headers.get("content-type");
-
-                StringTokenizer st = null;
-                if (contentTypeHeader != null) {
-                    st = new StringTokenizer(contentTypeHeader, ",; ");
-                    if (st.hasMoreTokens()) {
-                        contentType = st.nextToken();
-                    }
-                }
-
-                if ("multipart/form-data".equalsIgnoreCase(contentType)) {
-                    // Handle multipart/form-data
-                    if (!st.hasMoreTokens()) {
-                        throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
-                    }
-
-                    String boundaryStartString = "boundary=";
-                    int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
-                    String boundary = contentTypeHeader.substring(boundaryContentStart, contentTypeHeader.length());
-                    if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
-                        boundary = boundary.substring(1, boundary.length() - 1);
-                    }
-
-                    decodeMultipartData(boundary, fbuf, in, parms, files);
-                } else {
-                    String postLine = "";
-                    StringBuilder postLineBuffer = new StringBuilder();
-                    char pbuf[] = new char[512];
-                    int read = in.read(pbuf);
-                    while (read >= 0 && !postLine.endsWith("\r\n")) {
-                        postLine = String.valueOf(pbuf, 0, read);
-                        postLineBuffer.append(postLine);
-                        read = in.read(pbuf);
-                    }
-                    postLine = postLineBuffer.toString().trim();
-                    // Handle application/x-www-form-urlencoded
-                    if ("application/x-www-form-urlencoded".equalsIgnoreCase(contentType)) {
-                        decodeParms(postLine, parms);
-                    } else if (postLine.length() != 0) {
-                        // Special case for raw POST data => create a special io entry "postData" with raw content data
-                        files.put("postData", postLine);
-                    }
-                }
+                handlePost(files, randomAccessFile, fbuf);
             } else if (Method.PUT.equals(method)) {
                 files.put("content", saveTmpFile(fbuf, 0, fbuf.limit()));
             }
-        } finally {
-            close(randomAccessFile);
-            close(in);
+        }
+    }
+
+    private void handlePost(Map<String, String> files,
+                            RandomAccessFile randomAccessFile,
+                            ByteBuffer fbuf) throws IOException, ResponseException {
+        String contentType = "";
+        final String contentTypeHeader = headers.get("content-type");
+
+        StringTokenizer st = null;
+        if (contentTypeHeader != null) {
+            st = new StringTokenizer(contentTypeHeader, ",; ");
+            if (st.hasMoreTokens()) {
+                contentType = st.nextToken();
+            }
+        }
+
+        // Create a BufferedReader for easily reading it as string.
+        final InputStream bin = new FileInputStream(randomAccessFile.getFD());
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(bin))) {
+
+
+            if ("multipart/form-data".equalsIgnoreCase(contentType)) {
+                // Handle multipart/form-data
+                if (st == null || !st.hasMoreTokens()) {
+                    throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
+                }
+
+                String boundaryStartString = "boundary=";
+                int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
+                String boundary = contentTypeHeader.substring(boundaryContentStart, contentTypeHeader.length());
+                if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
+                    boundary = boundary.substring(1, boundary.length() - 1);
+                }
+
+                decodeMultipartData(boundary, fbuf, in, parms, files);
+            } else {
+                String postLine = "";
+                final StringBuilder postLineBuffer = new StringBuilder();
+                final char[] pbuf = new char[512];
+                int read = in.read(pbuf);
+                while (read >= 0 && !postLine.endsWith("\r\n")) {
+                    postLine = String.valueOf(pbuf, 0, read);
+                    postLineBuffer.append(postLine);
+                    read = in.read(pbuf);
+                }
+                postLine = postLineBuffer.toString().trim();
+                // Handle application/x-www-form-urlencoded
+                if ("application/x-www-form-urlencoded".equalsIgnoreCase(contentType)) {
+                    decodeParms(postLine, parms);
+                } else if (postLine.length() != 0) {
+                    // Special case for raw POST data => create a special io entry "postData" with raw content data
+                    files.put("postData", postLine);
+                }
+            }
         }
     }
 
@@ -245,7 +245,7 @@ public class Request implements IRequest {
      * Decodes the sent headers and loads the data into Key/value pairs
      */
     private void decodeHeader(BufferedReader in, Map<String, String> pre, Map<String, String> parms, Map<String, String> headers)
-            throws ResponseException {
+        throws ResponseException {
         try {
             // Read the request line
             String inLine = in.readLine();
@@ -389,7 +389,7 @@ public class Request implements IRequest {
     private int[] getBoundaryPositions(ByteBuffer b, byte[] boundary) {
         int matchcount = 0;
         int matchbyte = -1;
-        List<Integer> matchbytes = new ArrayList<Integer>();
+        List<Integer> matchbytes = new ArrayList<>();
         for (int i = 0; i < b.limit(); i++) {
             if (b.get(i) == boundary[matchcount]) {
                 if (matchcount == 0)
@@ -476,7 +476,7 @@ public class Request implements IRequest {
             int sep = e.indexOf('=');
             if (sep >= 0) {
                 p.put(UriUtil.decodePercent(e.substring(0, sep)).trim(),
-                        UriUtil.decodePercent(e.substring(sep + 1)));
+                    UriUtil.decodePercent(e.substring(sep + 1)));
             } else {
                 p.put(UriUtil.decodePercent(e).trim(), "");
             }
@@ -509,11 +509,11 @@ public class Request implements IRequest {
 
     @Override
     public final InputStream getInputStream() {
-        return inputStream;
+        return in;
     }
 
     @Override
-    public CookieHandler getCookies() {
+    public Cookies getCookies() {
         return cookies;
     }
 }

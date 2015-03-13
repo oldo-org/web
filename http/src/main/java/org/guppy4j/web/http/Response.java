@@ -221,5 +221,4 @@ public final class Response {
     public void setChunkedTransfer(boolean chunkedTransfer) {
         this.chunkedTransfer = chunkedTransfer;
     }
-
 }
