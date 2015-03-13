@@ -66,7 +66,7 @@ public final class ServerDaemon implements IDaemon, IPortListener {
     }
 
     /* *** Interface methods *** */
-    
+
     /**
      * Start the server.
      *
@@ -83,14 +83,14 @@ public final class ServerDaemon implements IDaemon, IPortListener {
      */
     @Override
     public void stop() {
-        try {
-            close(serverSocket);
-            connections.closeAll();
-            if (serverThread != null) {
+        close(serverSocket);
+        connections.closeAll();
+        if (serverThread != null) {
+            try {
                 serverThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -127,8 +127,8 @@ public final class ServerDaemon implements IDaemon, IPortListener {
 
     private void handleRequest(Socket socket, InputStream in) {
         try (OutputStream out = socket.getOutputStream()) {
-            final TempFiles tempFiles = tempFilesFactory.create();
-            final IRequest request = new Request(tempFiles, in, out, socket.getInetAddress());
+            final TempFiles files = tempFilesFactory.create();
+            final IRequest request = new Request(files, in, out, socket.getInetAddress());
             while (!socket.isClosed()) {
                 request.handleBy(server);
             }
@@ -158,8 +158,8 @@ public final class ServerDaemon implements IDaemon, IPortListener {
 
     private static InetSocketAddress getSocketAddress(String hostname, int port) {
         return (hostname != null)
-            ? new InetSocketAddress(hostname, port)
-            : new InetSocketAddress(port);
+                ? new InetSocketAddress(hostname, port)
+                : new InetSocketAddress(port);
     }
 
     private static ServerSocket createServerSocket() {
