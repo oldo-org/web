@@ -6,35 +6,43 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
+import java.util.Map.Entry;
 
+import static java.lang.Math.min;
+import static java.util.TimeZone.getTimeZone;
 import static org.guppy4j.web.http.util.ConnectionUtil.close;
 
 /**
  * HTTP response. Return one of these from serve().
  */
-public class Response {
+public final class Response {
+
+    private static final String CR_LF = "\r\n";
+
+    private static final int BUFFER_SIZE = 16 * 1024;
+
     /**
      * HTTP status code after processing, e.g. "200 OK", HTTP_OK
      */
-    private IStatus status;
+    private final IStatus status;
     /**
      * MIME type of content, e.g. "text/html"
      */
-    private String mimeType;
+    private final String mimeType;
     /**
      * Data of the response, may be null.
      */
-    private InputStream data;
+    private final InputStream data;
     /**
      * Headers for the HTTP response. Use addHeader() to add lines.
      */
-    private Map<String, String> header = new HashMap<String, String>();
+    private final Map<String, String> headers = new HashMap<>();
     /**
      * The request method that spawned this response.
      */
@@ -64,12 +72,18 @@ public class Response {
      * Convenience method that makes an InputStream out of given text.
      */
     public Response(IStatus status, String mimeType, String txt) {
-        this.status = status;
-        this.mimeType = mimeType;
+        this(status, mimeType, toStream(txt));
+    }
+
+    private static InputStream toStream(String txt) {
+        if (txt == null) {
+            return null;
+        }
         try {
-            this.data = txt != null ? new ByteArrayInputStream(txt.getBytes("UTF-8")) : null;
+            return new ByteArrayInputStream(txt.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException uee) {
             uee.printStackTrace();
+            return null;
         }
     }
 
@@ -77,105 +91,105 @@ public class Response {
      * Adds given line to the header.
      */
     public void addHeader(String name, String value) {
-        header.put(name, value);
+        headers.put(name, value);
     }
 
     public String getHeader(String name) {
-        return header.get(name);
+        return headers.get(name);
     }
 
     /**
      * Sends given response to the socket.
      */
-    protected void send(OutputStream outputStream) {
-        final String mime = mimeType;
-        final SimpleDateFormat gmtFrmt = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
-        gmtFrmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-
+    void send(OutputStream outputStream) {
         try {
             if (status == null) {
-                throw new Error("sendResponse(): Status can't be null.");
+                throw new IllegalStateException("sendResponse(): Status can't be null.");
             }
             final PrintWriter pw = new PrintWriter(outputStream);
-            pw.print("HTTP/1.1 " + status.getDescription() + " \r\n");
+            pw.print("HTTP/1.1 " + status.getDescription() + ' ' + CR_LF);
 
-            if (mime != null) {
-                pw.print("Content-Type: " + mime + "\r\n");
+            if (mimeType != null) {
+                pw.print("Content-Type: " + mimeType + CR_LF);
             }
 
-            if (header == null || header.get("Date") == null) {
-                pw.print("Date: " + gmtFrmt.format(new Date()) + "\r\n");
+            if (headers == null || headers.get("Date") == null) {
+                final DateFormat gmtFrmt = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+                gmtFrmt.setTimeZone(getTimeZone("GMT"));
+                pw.print("Date: " + gmtFrmt.format(new Date()) + CR_LF);
             }
 
-            if (header != null) {
-                for (String key : header.keySet()) {
-                    String value = header.get(key);
-                    pw.print(key + ": " + value + "\r\n");
+            if (headers != null) {
+                for (Entry<String, String> e : headers.entrySet()) {
+                    pw.print(e.getKey() + ": " + e.getValue() + CR_LF);
                 }
             }
 
-            sendConnectionHeaderIfNotAlreadyPresent(pw, header);
+            sendConnectionHeaderIfNotAlreadyPresent(pw, headers);
 
             if (requestMethod != Method.HEAD && chunkedTransfer) {
                 sendAsChunked(outputStream, pw);
             } else {
-                int pending = data != null ? data.available() : 0;
-                sendContentLengthHeaderIfNotAlreadyPresent(pw, header, pending);
-                pw.print("\r\n");
+                final int pending = data != null ? data.available() : 0;
+                sendContentLengthHeaderIfNotAlreadyPresent(pw, headers, pending);
+                pw.print(CR_LF);
                 pw.flush();
                 sendAsFixedLength(outputStream, pending);
             }
             outputStream.flush();
-            close(data);
         } catch (IOException ioe) {
             // Couldn't write? No can do.
+        } finally {
+            close(data);
         }
     }
 
-    protected void sendContentLengthHeaderIfNotAlreadyPresent(PrintWriter pw, Map<String, String> header, int size) {
+    private static void sendContentLengthHeaderIfNotAlreadyPresent(PrintWriter pw,
+                                                                   Map<String, String> header,
+                                                                   int size) {
         if (!headerAlreadySent(header, "content-length")) {
-            pw.print("Content-Length: " + size + "\r\n");
+            pw.print("Content-Length: " + size + CR_LF);
         }
     }
 
-    protected void sendConnectionHeaderIfNotAlreadyPresent(PrintWriter pw, Map<String, String> header) {
+    private static void sendConnectionHeaderIfNotAlreadyPresent(PrintWriter pw, Map<String, String> header) {
         if (!headerAlreadySent(header, "connection")) {
-            pw.print("Connection: keep-alive\r\n");
+            pw.print("Connection: keep-alive" +
+                CR_LF);
         }
     }
 
-    private boolean headerAlreadySent(Map<String, String> header, String name) {
-        boolean alreadySent = false;
+    private static boolean headerAlreadySent(Map<String, String> header, String name) {
         for (String headerName : header.keySet()) {
-            alreadySent |= headerName.equalsIgnoreCase(name);
+            if (headerName.equalsIgnoreCase(name)) {
+                return true;
+            }
         }
-        return alreadySent;
+        return false;
     }
 
     private void sendAsChunked(OutputStream outputStream, PrintWriter pw) throws IOException {
-        pw.print("Transfer-Encoding: chunked\r\n");
-        pw.print("\r\n");
+        pw.print("Transfer-Encoding: chunked" + CR_LF);
+        pw.print(CR_LF);
         pw.flush();
-        int BUFFER_SIZE = 16 * 1024;
-        byte[] CRLF = "\r\n".getBytes();
-        byte[] buff = new byte[BUFFER_SIZE];
+        final byte[] crlf = CR_LF.getBytes();
+        final byte[] buff = new byte[BUFFER_SIZE];
         int read;
         while ((read = data.read(buff)) > 0) {
-            outputStream.write(String.format("%x\r\n", read).getBytes());
+            outputStream.write(String.format("%x" + CR_LF, read).getBytes());
             outputStream.write(buff, 0, read);
-            outputStream.write(CRLF);
+            outputStream.write(crlf);
         }
-        outputStream.write(String.format("0\r\n\r\n").getBytes());
+        outputStream.write(String.format('0' + CR_LF + CR_LF).getBytes());
     }
 
     private void sendAsFixedLength(OutputStream outputStream, int pending) throws IOException {
         if (requestMethod != Method.HEAD && data != null) {
-            int BUFFER_SIZE = 16 * 1024;
-            byte[] buff = new byte[BUFFER_SIZE];
+            final byte[] buff = new byte[BUFFER_SIZE];
             while (pending > 0) {
-                int read = data.read(buff, 0, ((pending > BUFFER_SIZE) ? BUFFER_SIZE : pending));
+                final int read = data.read(buff, 0, min(pending, BUFFER_SIZE));
                 if (read <= 0) {
-                    break;
+                    return;
                 }
                 outputStream.write(buff, 0, read);
                 pending -= read;
@@ -183,31 +197,20 @@ public class Response {
         }
     }
 
-    public IStatus getStatus() {
+    public IStatus status() {
         return status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public String getMimeType() {
+    public String mimeType() {
         return mimeType;
     }
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    public InputStream getData() {
+    public InputStream data() {
         return data;
     }
 
-    public void setData(InputStream data) {
-        this.data = data;
-    }
 
-    public Method getRequestMethod() {
+    public Method requestMethod() {
         return requestMethod;
     }
 
