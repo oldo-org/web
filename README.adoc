@@ -1,5 +1,3 @@
-[%hardbreaks]
-
 = guppy4j / web
 
 Pure Java web framework
@@ -34,11 +32,11 @@ link="https://travis-ci.org/guppy4j/web"]
 
 Projects I am reviewing for ideas:
 
-Grab method name of MethodReference using proxies (for chained method handles that keep track of method path): 
-- http://benjiweber.co.uk/blog/2013/12/28/typesafe-database-interaction-with-java-8/
+Grab method name of MethodReference using proxies (for chained method handles that keep track of method path): +
+http://benjiweber.co.uk/blog/2013/12/28/typesafe-database-interaction-with-java-8/
 
-For RESTful approach and readable API (but not the JSP part):
-- https://github.com/caelum/vraptor
+For RESTful approach and readable API (but not the JSP part): +
+https://github.com/caelum/vraptor
 
 For some ideas around HTML generation in pure Java (DSL):
 - https://github.com/luiz/vraptor-html-dsl
