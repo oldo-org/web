@@ -14,19 +14,19 @@ link="https://travis-ci.org/guppy4j/web"]
 
 == Requirements
 
-x  Allow MVC and component style web development in pure Java +
-x  No HTML, CSS, JSP, XML or properties files +
-x  Provide libraries for pure Java representation of HTML and CSS + 
-x  Templating in Java (methods, inheritance, parametrization) +
-x  Validation as part of the domain model classes +
-x  Limit the use of annotations and reflection +
-x  Localization using L10n registry, lookup in Java +
-x  Page navigation rules in pure Java +
-x  Pluggable URL routing (with resource based approach as default) +
-x  Transparent conversion of HTTP params to model objects +
-x  Deployable as WAR to standard web containers like Tomcat +
-x  Use interfaces and immutable objects wherever possible +
-x  TBD: JavaScript / Ajax support +
+o  Allow MVC and component style web development in pure Java +
+o  No HTML, CSS, JSP, XML or properties files +
+o  Provide libraries for pure Java representation of HTML and CSS + 
+o  Templating in Java (methods, inheritance, parametrization) +
+o  Validation as part of the domain model classes +
+o  Limit the use of annotations and reflection +
+o  Localization using L10n registry, lookup in Java +
+o  Page navigation rules in pure Java +
+o  Pluggable URL routing (with resource based approach as default) +
+o  Transparent conversion of HTTP params to model objects +
+o  Deployable as WAR to standard web containers like Tomcat +
+o  Use interfaces and immutable objects wherever possible +
+o  TBD: JavaScript / Ajax support +
 
 == Related libraries/frameworks
 
