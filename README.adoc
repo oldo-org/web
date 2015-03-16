@@ -14,35 +14,35 @@ link="https://travis-ci.org/guppy4j/web"]
 
 == Requirements
 
-Allow MVC and component style web development in pure Java +
-No HTML, CSS, JSP, XML or properties files +
-Provide libraries for pure Java representation of HTML and CSS + 
-Templating in Java (methods, inheritance, parametrization) +
-Validation as part of the domain model classes +
-Limit the use of annotations and reflection +
-Localization using L10n registry, lookup in Java +
-Page navigation rules in pure Java +
-Pluggable URL routing (with resource based approach as default) +
-Transparent conversion of HTTP params to model objects +
-Deployable as WAR to standard web containers like Tomcat +
-Use interfaces and immutable objects wherever possible +
-TBD: JavaScript / Ajax support +
+- Allow MVC and component style web development in pure Java +
+- No HTML, CSS, JSP, XML or properties files +
+- Provide libraries for pure Java representation of HTML and CSS + 
+- Templating in Java (methods, inheritance, parametrization) +
+- Validation as part of the domain model classes +
+- Limit the use of annotations and reflection +
+- Localization using L10n registry, lookup in Java +
+- Page navigation rules in pure Java +
+- Pluggable URL routing (with resource based approach as default) +
+- Transparent conversion of HTTP params to model objects +
+- Deployable as WAR to standard web containers like Tomcat +
+- Use interfaces and immutable objects wherever possible +
+- TBD: JavaScript / Ajax support +
 
 == Related libraries/frameworks
 
 Projects I am reviewing for ideas:
 
 Grab method name of MethodReference using proxies (for chained method handles that keep track of method path): +
-http://benjiweber.co.uk/blog/2013/12/28/typesafe-database-interaction-with-java-8/ +
+- http://benjiweber.co.uk/blog/2013/12/28/typesafe-database-interaction-with-java-8/ +
 
 For RESTful approach and readable API (but not the JSP part): +
-https://github.com/caelum/vraptor +
+- https://github.com/caelum/vraptor +
 
 For some ideas around HTML generation in pure Java (DSL): + 
-  https://github.com/luiz/vraptor-html-dsl +
-  http://code.google.com/p/jatl/ +
-  https://github.com/emicklei/rendersnake +
-  http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/package-summary.html +
+- https://github.com/luiz/vraptor-html-dsl +
+- http://code.google.com/p/jatl/ +
+- https://github.com/emicklei/rendersnake +
+- http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/package-summary.html +
 
 For some ideas around CSS representation in pure Java: +
 - https://github.com/corgrath/Java-CSS-Library +
