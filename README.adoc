@@ -14,9 +14,9 @@ link="https://travis-ci.org/guppy4j/web"]
 
 == Requirements
 
-- Allow MVC and component style web development in pure Java +
-- No HTML, CSS, JSP, XML or properties files +
-- Provide libraries for pure Java representation of HTML and CSS + 
+> Allow MVC and component style web development in pure Java +
+> No HTML, CSS, JSP, XML or properties files +
+> Provide libraries for pure Java representation of HTML and CSS + 
 - Templating in Java (methods, inheritance, parametrization) +
 - Validation as part of the domain model classes +
 - Limit the use of annotations and reflection +
