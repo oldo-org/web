@@ -35,20 +35,20 @@ link="https://travis-ci.org/guppy4j/web"]
 Projects I am reviewing for ideas:
 
 Grab method name of MethodReference using proxies (for chained method handles that keep track of method path): 
- http://benjiweber.co.uk/blog/2013/12/28/typesafe-database-interaction-with-java-8/
+- http://benjiweber.co.uk/blog/2013/12/28/typesafe-database-interaction-with-java-8/
 
 For RESTful approach and readable API (but not the JSP part):
- https://github.com/caelum/vraptor
+- https://github.com/caelum/vraptor
 
 For some ideas around HTML generation in pure Java (DSL):
- https://github.com/luiz/vraptor-html-dsl
- http://code.google.com/p/jatl/
- https://github.com/emicklei/rendersnake
- http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/package-summary.html
+- https://github.com/luiz/vraptor-html-dsl
+- http://code.google.com/p/jatl/
+- https://github.com/emicklei/rendersnake
+- http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/package-summary.html
 
 For some ideas around CSS representation in pure Java:
- https://github.com/corgrath/Java-CSS-Library
- https://code.google.com/p/phloc-css/
+- https://github.com/corgrath/Java-CSS-Library
+- https://code.google.com/p/phloc-css/
 
 For how complex pure Java templating is in JSF:
- http://java.dzone.com/articles/creating-jsf-pages-pure-java
+- http://java.dzone.com/articles/creating-jsf-pages-pure-java
