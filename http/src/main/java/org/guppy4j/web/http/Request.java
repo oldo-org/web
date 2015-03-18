@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
 import static org.guppy4j.web.http.util.ConnectionUtil.close;
 
 /**
- * TODO: Document this briefly
+ * HTTP request (or request series due to keepalive)
  */
 public final class Request implements IRequest {
 
@@ -211,8 +211,8 @@ public final class Request implements IRequest {
                     throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
                 }
 
-                String boundaryStartString = "boundary=";
-                int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
+                final String boundaryStartString = "boundary=";
+                final int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
                 String boundary = contentTypeHeader.substring(boundaryContentStart, contentTypeHeader.length());
                 if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
                     boundary = boundary.substring(1, boundary.length() - 1);
@@ -229,13 +229,13 @@ public final class Request implements IRequest {
                     postLineBuffer.append(postLine);
                     read = in.read(pbuf);
                 }
-                postLine = postLineBuffer.toString().trim();
+                final String trimmedLine = postLineBuffer.toString().trim();
                 // Handle application/x-www-form-urlencoded
                 if ("application/x-www-form-urlencoded".equalsIgnoreCase(contentType)) {
-                    decodeParms(postLine, parms);
-                } else if (postLine.length() != 0) {
+                    decodeParms(trimmedLine, parms);
+                } else if (!trimmedLine.isEmpty()) {
                     // Special case for raw POST data => create a special io entry "postData" with raw content data
-                    files.put("postData", postLine);
+                    files.put("postData", trimmedLine);
                 }
             }
         }
@@ -248,12 +248,12 @@ public final class Request implements IRequest {
         throws ResponseException {
         try {
             // Read the request line
-            String inLine = in.readLine();
+            final String inLine = in.readLine();
             if (inLine == null) {
                 return;
             }
 
-            StringTokenizer st = new StringTokenizer(inLine);
+            final StringTokenizer st = new StringTokenizer(inLine);
             if (!st.hasMoreTokens()) {
                 throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html");
             }
@@ -264,16 +264,18 @@ public final class Request implements IRequest {
                 throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Missing URI. Usage: GET /example/file.html");
             }
 
-            String uri = st.nextToken();
+            final String uriToken = st.nextToken();
+            final String uri;
 
             // Decode parameters from the URI
-            int qmi = uri.indexOf('?');
+            final int qmi = uriToken.indexOf('?');
             if (qmi >= 0) {
-                decodeParms(uri.substring(qmi + 1), parms);
-                uri = UriUtil.decodePercent(uri.substring(0, qmi));
+                decodeParms(uriToken.substring(qmi + 1), parms);
+                uri = UriUtil.decodePercent(uriToken.substring(0, qmi));
             } else {
-                uri = UriUtil.decodePercent(uri);
+                uri = UriUtil.decodePercent(uriToken);
             }
+            pre.put("uri", uri);
 
             // If there's another token, it's protocol version,
             // followed by HTTP headers. Ignore version but parse headers.
@@ -289,7 +291,6 @@ public final class Request implements IRequest {
                 }
             }
 
-            pre.put("uri", uri);
         } catch (IOException ioe) {
             throw new ResponseException(Status.INTERNAL_ERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage(), ioe);
         }

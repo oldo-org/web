@@ -11,7 +11,10 @@ import static java.util.Arrays.asList;
  * Attribute creation using method names
  * that match the HTML5 attribute names
  */
-public class AttributeFactory {
+public final class AttributeFactory {
+
+    private AttributeFactory() {
+    }
 
     public static <M> Lang<M> lang(Function<M, LanguageCode> value) {
         return new Lang<>(value);

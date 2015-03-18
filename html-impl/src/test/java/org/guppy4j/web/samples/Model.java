@@ -4,7 +4,7 @@ import org.guppy4j.web.html.attribute.type.LanguageCode;
 import org.guppy4j.web.html.model.Variable;
 
 /**
- * TODO: Document this!
+ * Sample model for testing
  */
 public interface Model {
 

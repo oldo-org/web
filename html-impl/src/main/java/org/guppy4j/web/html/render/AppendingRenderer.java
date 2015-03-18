@@ -5,12 +5,12 @@ import static org.guppy4j.web.html.logic.Functions.tryTo;
 /**
  * Renders by appending to an Appendable
  */
-public class AppendingRenderer implements Renderer {
+public final class AppendingRenderer implements Renderer {
 
     private final Appendable a;
 
     public AppendingRenderer(Appendable appendable) {
-        this.a = appendable;
+        a = appendable;
     }
 
     @Override

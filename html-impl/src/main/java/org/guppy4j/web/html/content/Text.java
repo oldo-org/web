@@ -14,7 +14,7 @@ import static org.guppy4j.web.html.logic.Functions.is;
 /**
  * Text nodes
  */
-public class Text<M> implements TitleContent<M>, BodyContent<M>, SpanContent<M> {
+public final class Text<M> implements TitleContent<M>, BodyContent<M>, SpanContent<M> {
 
     public static <M> Text<M> $(String value) {
         return new Text<>(is(value));
@@ -35,7 +35,7 @@ public class Text<M> implements TitleContent<M>, BodyContent<M>, SpanContent<M> 
     }
 
     public Text(Mapping<M, Variable<?>> value) {
-        this.value = (m -> value.map(m).get());
+        this.value = m -> value.map(m).get();
     }
 
     @Override

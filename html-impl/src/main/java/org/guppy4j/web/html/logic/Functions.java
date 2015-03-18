@@ -5,7 +5,11 @@ import java.util.function.Function;
 /**
  * Helper functions
  */
-public class Functions {
+public final class Functions {
+
+    private Functions() {
+        // no instances
+    }
 
     public static <M, T> Function<M, T> is(T value) {
         return m -> value;

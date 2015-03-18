@@ -1,9 +1,10 @@
 package org.guppy4j.web.html.model;
 
 /**
- * TODO: Document this!
+ * A mutable value holder aka "variable"
+ * to be used in data tree models
  */
-public class VariableImpl<T> implements Variable<T> {
+public final class VariableImpl<T> implements Variable<T> {
 
     private T t;
 
