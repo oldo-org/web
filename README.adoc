@@ -20,17 +20,19 @@ o-  Provide libraries for pure Java representation of HTML and CSS +
 o-  Templating in Java (methods, inheritance, parametrization) +
 o-  Validation as part of the domain model classes +
 o-  Limit the use of annotations and reflection +
+o-  Use interfaces and immutable objects wherever possible +
 o-  Localization using L10n registry, lookup in Java +
 o-  Page navigation rules in pure Java +
 o-  Pluggable URL routing (with resource based approach as default) +
 o-  Transparent conversion of HTTP params to model objects +
-o-  Deployable as WAR to standard web containers like Tomcat +
-o-  Use interfaces and immutable objects wherever possible +
+o-  By default each "webapp" runs in separate JVM using embedded HTTP engine +
+o-  Utilize a high performance HTTP engine like Undertow +
+o-  Future: Deployable as WAR to standard web containers like Tomcat +
 o-  TBD: JavaScript / Ajax support +
 
 == Related libraries/frameworks
 
-Projects I am reviewing for ideas:
+Projects I review for ideas:
 
 Grab method name of MethodReference using proxies (for chained method handles that keep track of method path): +
 - http://benjiweber.co.uk/blog/2013/12/28/typesafe-database-interaction-with-java-8/ +
