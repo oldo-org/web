@@ -3,10 +3,7 @@ package org.guppy4j.http;
 import java.util.function.Predicate;
 
 /**
- * A resource in the HTTP sense, also known as "web resource",
- * within a "RESTful architecture"
- *
- * @see <a href="http://rest.elkstein.org/">REST</a>
+ * TODO: Document this!
  */
 public interface Resource<I, T> {
 
@@ -32,3 +29,4 @@ public interface Resource<I, T> {
 
     */
 }
+

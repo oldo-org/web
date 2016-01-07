@@ -5,18 +5,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.guppy4j</groupId>
         <artifactId>web</artifactId>
+        <groupId>org.guppy4j</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>http</artifactId>
+    <artifactId>http-undertow</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.guppy4j</groupId>
-            <artifactId>core</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>http-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>1.2.8.Final</version>
         </dependency>
     </dependencies>
+
 
 </project>
