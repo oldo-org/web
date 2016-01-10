@@ -1,15 +1,16 @@
 package org.guppy4j.html.tag;
 
+import org.guppy4j.html.Tag;
 import org.guppy4j.html.marker.BodyContent;
 import org.guppy4j.html.marker.SpanAttribute;
 import org.guppy4j.html.marker.SpanContent;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.guppy4j.html.tag.Element.span;
+import static org.guppy4j.html.Element.span;
 
 /**
- * TODO: Document this!
+ * The 'span' tag
  */
 public class Span<M> extends Tag<M, SpanAttribute<M>, SpanContent<M>>
     implements BodyContent<M> {

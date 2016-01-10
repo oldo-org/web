@@ -1,5 +1,6 @@
 package org.guppy4j.html.tag;
 
+import org.guppy4j.html.Tag;
 import org.guppy4j.html.marker.HtmlAttribute;
 import org.guppy4j.html.marker.HtmlContent;
 
@@ -7,10 +8,10 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.guppy4j.html.tag.Element.html;
+import static org.guppy4j.html.Element.html;
 
 /**
- * "html" tag
+ * The "html" tag
  */
 public class Html<M> extends Tag<M, HtmlAttribute<M>, HtmlContent<M>> {
 

@@ -1,15 +1,16 @@
 package org.guppy4j.html.tag;
 
+import org.guppy4j.html.Tag;
 import org.guppy4j.html.marker.BodyAttribute;
 import org.guppy4j.html.marker.BodyContent;
 import org.guppy4j.html.marker.HtmlContent;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.guppy4j.html.tag.Element.body;
+import static org.guppy4j.html.Element.body;
 
 /**
- * "body" tag
+ * The 'body' tag
  */
 public class Body<M> extends Tag<M, BodyAttribute<M>, BodyContent<M>>
     implements HtmlContent<M> {

@@ -1,6 +1,5 @@
-package org.guppy4j.html.tag;
+package org.guppy4j.html;
 
-import org.guppy4j.html.Content;
 import org.guppy4j.html.attribute.Attribute;
 import org.guppy4j.html.render.Renderable;
 import org.guppy4j.html.render.Renderer;

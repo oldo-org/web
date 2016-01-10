@@ -1,4 +1,4 @@
-package org.guppy4j.html.tag;
+package org.guppy4j.html;
 
 /**
  * Enumeration of all valid HTML5 tag, based on the
@@ -59,13 +59,47 @@ public enum Element {
      */
     noscript,
 
-    /* Sections */
+    /* --- Sections --- */
 
     section,
     nav,
     article,
     aside,
-    h1, h2, h3, h4, h5, span, h6
+    h1, h2, h3, h4, h5, h6,
+
+    /* --- Grouping content --- */
+
+    /**
+     * A generic container with no special meaning.
+     */
+    div,
+
+    /* --- Forms --- */
+
+    /**
+     * A formular, consisting of controls, that can be submitted to a server for processing.
+     */
+    form,
+    /**
+     * A set of controls
+     */
+    fieldset,
+    /**
+     * The caption for a fieldset
+     */
+    legend,
+    /**
+     * RThe caption of a form control.
+     */
+    label,
+
+    /* --- Text-level semantics --- */
+
+    /**
+     * Doesn't mean anything on its own, but can be useful when used together with the global attributes,
+     * e.g. class, lang, or dir. It represents its children.
+     */
+    span
 
 /*
 Element 	Description
@@ -81,7 +115,9 @@ Represents the main content of an HTML document. There is only one <body> elemen
 <footer> This element has been added in HTML5 	Defines the footer for a page or section. It often contains a copyright notice, some links to legal information or addresses to give feedback.
 <address> 	Defines a section containing contact information.
 <main>This element has been added in HTML5 	Defines the main or important content in the document. There is only one <main> element in the document.
+
 Grouping content
+
 Element 	Description
 <p> 	Defines a portion that should be displayed as a paragrah.
 <hr> 	Represents a thematic break between paragraphs of a section or article or any longer content.
@@ -95,7 +131,6 @@ Element 	Description
 <dd> 	Represents the definition of the terms immediately listed before it.
 <figure> This element has been added in HTML5 	Represents a figure illustrated a part of the document.
 <figcaption> This element has been added in HTML5 	Represents the legend of a figure.
-<div> 	Represents a generic container with no special meaning.
 Text-level semantics
 Element 	Description
 <a> 	Represents an hyperlink, linking to another resource.
@@ -121,9 +156,9 @@ Element 	Description
 <ruby> This element has been added in HTML5 	Represents content to be marked with ruby annotations, short runs of text presented alongside the text. This is often used in conjunction with East Asian language where the annotations act as a guide for pronunciation, like the Japanese furigana.
 <rt> This element has been added in HTML5 	Represents the text of a ruby annotation.
 <rp> This element has been added in HTML5 	Represents parenthesis around a ruby annotation, used to display the annotation in an alternate way by browsers not supporting the standard display for annotations.
-<bdi> This element has been added in HTML5 	Represents text that must be isolated from its surrounding for bidirectional text formatting. It allows to embed span of text with a different, or unknown, directionality.
+<bdi> This element has been added in HTML5 	Represents text that must be isolated from its surrounding for bidirectional text formatting. It allows to embed element of text with a different, or unknown, directionality.
 <bdo> 	Represents the directionality of its children, in order to explicitly override the Unicode bidirectional algorithm.
-<span> 	Represents text with no specific meaning. This has to be used when no other text-semantic element conveys an adequate meaning, which, in this case, is often brought by global attribute like class, lang, or dir.
+<element> 	Represents text with no specific meaning. This has to be used when no other text-semantic element conveys an adequate meaning, which, in this case, is often brought by global attribute like class, lang, or dir.
 <br> 	Represents a line break.
 <wbr> This element has been added in HTML5 	Represents a line break opportunity, that is a suggested wrapping point in order to improve readability of text split on several lines.
 Edits
@@ -158,12 +193,10 @@ Element 	Description
 <tr> 	Represents a row of cells in a table.
 <td> 	Represents a data cell in a table.
 <th> 	Represents a header cell in a table.
+
 Forms
+
 Element 	Description
-<form> 	Represents a formular, consisting of controls, that can be submitted to a server for processing.
-<fieldset> 	Represents a set of controls.
-<legend> 	Represents the caption for a <fieldset>.
-<label> 	Represents the caption of a form control.
 <input> 	Represents a typed data field allowing the user to edit the data.
 <button> 	Represents a button.
 <select> 	Represents a control allowing the selection among a set of options.
