@@ -1,7 +1,5 @@
 package org.guppy4j.html;
 
-import org.guppy4j.html.render.Renderable;
-
 /**
  * Tag body part
  */

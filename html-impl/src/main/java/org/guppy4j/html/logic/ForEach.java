@@ -3,7 +3,7 @@ package org.guppy4j.html.logic;
 import org.guppy4j.html.Content;
 import org.guppy4j.html.marker.AnyContent;
 import org.guppy4j.html.model.Variable;
-import org.guppy4j.html.render.Renderer;
+import org.guppy4j.html.Out;
 
 import java.util.function.Function;
 
@@ -26,12 +26,12 @@ public class ForEach<M, I, CM extends Content<M>> implements AnyContent<M> {
     }
 
     @Override
-    public void render(Renderer renderer, M model) {
+    public void render(Out out, M model) {
         final Variable<I> var = holder.apply(model);
         for (I item : items.apply(model)) {
             var.set(item);
             for (CM content : contents) {
-                content.render(renderer, model);
+                content.render(out, model);
             }
         }
         // clear the loop variable

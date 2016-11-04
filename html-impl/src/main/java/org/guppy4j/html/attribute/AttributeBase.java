@@ -1,6 +1,6 @@
 package org.guppy4j.html.attribute;
 
-import org.guppy4j.html.render.Renderer;
+import org.guppy4j.html.Out;
 
 import java.util.function.Function;
 
@@ -18,13 +18,13 @@ public class AttributeBase<M> implements Attribute<M> {
     }
 
     @Override
-    public void render(Renderer r, M m) {
-        r.render(' ');
-        r.render(name);
-        r.render('=');
-        r.render('"');
-        r.render(value(m));
-        r.render('"');
+    public void render(Out out, M m) {
+        out.write(' ');
+        out.write(name);
+        out.write('=');
+        out.write('"');
+        out.write(value(m));
+        out.write('"');
     }
 
     private String value(M model) {

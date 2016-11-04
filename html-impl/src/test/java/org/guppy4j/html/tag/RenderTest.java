@@ -3,8 +3,8 @@ package org.guppy4j.html.tag;
 import org.guppy4j.html.attribute.type.LanguageCode;
 import org.guppy4j.html.model.Variable;
 import org.guppy4j.html.model.VariableImpl;
-import org.guppy4j.html.render.AppendingRenderer;
-import org.guppy4j.html.render.Renderer;
+import org.guppy4j.html.render.Appender;
+import org.guppy4j.html.Out;
 import org.guppy4j.samples.Model;
 import org.junit.Test;
 
@@ -46,10 +46,10 @@ public class RenderTest {
             );
 
         final StringBuilder sb = new StringBuilder();
-        final Renderer renderer = new AppendingRenderer(sb);
+        final Out out = new Appender(sb);
         final Model model = createTestModel();
 
-        html.render(renderer, model);
+        html.render(out, model);
 
         System.out.print(sb);
     }

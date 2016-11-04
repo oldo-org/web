@@ -3,7 +3,7 @@ package org.guppy4j.html.content;
 import org.guppy4j.html.logic.Mapping;
 import org.guppy4j.html.marker.*;
 import org.guppy4j.html.model.Variable;
-import org.guppy4j.html.render.Renderer;
+import org.guppy4j.html.Out;
 
 import java.util.function.Function;
 
@@ -38,8 +38,7 @@ public final class Text<M> implements TitleContent<M>, BodyContent<M>, SpanConte
     }
 
     @Override
-    public void render(Renderer renderer, M model) {
-        final Object o = value.apply(model);
-        renderer.render(o == null ? "" : o.toString());
+    public void render(Out out, M model) {
+        out.write(String.valueOf(value.apply(model)));
     }
 }

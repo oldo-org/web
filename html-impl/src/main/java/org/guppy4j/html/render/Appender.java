@@ -1,25 +1,27 @@
 package org.guppy4j.html.render;
 
+import org.guppy4j.html.Out;
+
 import static org.guppy4j.html.logic.Functions.tryTo;
 
 /**
  * Renders by appending to an Appendable
  */
-public final class AppendingRenderer implements Renderer {
+public final class Appender implements Out {
 
     private final Appendable a;
 
-    public AppendingRenderer(Appendable appendable) {
+    public Appender(Appendable appendable) {
         a = appendable;
     }
 
     @Override
-    public void render(final String s) {
+    public void write(final String s) {
         tryTo(() -> a.append(s));
     }
 
     @Override
-    public void render(final char c) {
+    public void write(final char c) {
         tryTo(() -> a.append(c));
     }
 }

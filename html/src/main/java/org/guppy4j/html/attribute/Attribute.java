@@ -1,6 +1,6 @@
 package org.guppy4j.html.attribute;
 
-import org.guppy4j.html.render.Renderable;
+import org.guppy4j.html.Renderable;
 
 /**
  * String name/value pair
