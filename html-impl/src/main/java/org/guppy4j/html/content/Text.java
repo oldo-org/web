@@ -23,12 +23,12 @@ public final class Text<M> implements TitleContent<M>, BodyContent<M>, SpanConte
         return new Text<>(is(value));
     }
 
-    public static <M> Text<M> $(Function<M, Object> value) {
+    public static <M> Text<M> $(Function<M, ?> value) {
         return new Text<>(value);
     }
 
     public static <M> Text<M> $(Mapping<M, Variable<?>> value) {
-        return new Text<>(value);
+        return new Text<M>(value);
     }
 
     private final Function<M, ?> value;
