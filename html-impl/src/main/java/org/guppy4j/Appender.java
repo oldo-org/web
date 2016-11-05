@@ -1,8 +1,8 @@
-package org.guppy4j.html.render;
+package org.guppy4j;
 
 import org.guppy4j.html.Out;
 
-import static org.guppy4j.html.logic.Functions.tryTo;
+import static org.guppy4j.Functions.tryTo;
 
 /**
  * Renders by appending to an Appendable

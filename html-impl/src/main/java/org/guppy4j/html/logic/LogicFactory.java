@@ -1,6 +1,8 @@
 package org.guppy4j.html.logic;
 
 import org.guppy4j.html.Content;
+import org.guppy4j.html.Renderable;
+import org.guppy4j.html.marker.AnyContent;
 import org.guppy4j.html.model.Variable;
 
 import java.util.function.Function;
@@ -18,5 +20,12 @@ public class LogicFactory {
 
         final ForEach<M, I, CM> forEach = new ForEach<>(items, holder, contents);
         return (CM) forEach;
+    }
+
+    @SafeVarargs
+    public static <M, X> AnyContent<M> forProperty(
+            Function<M, X> getter,
+            Renderable<X>... contents) {
+        return new ForProperty<>(getter, contents);
     }
 }

@@ -15,4 +15,6 @@ public interface Model {
     Iterable<String> names();
 
     Variable<String> name();
+
+    Part part();
 }

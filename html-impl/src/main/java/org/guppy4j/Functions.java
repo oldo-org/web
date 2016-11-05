@@ -1,4 +1,6 @@
-package org.guppy4j.html.logic;
+package org.guppy4j;
+
+import org.guppy4j.html.logic.DoSomething;
 
 import java.util.function.Function;
 

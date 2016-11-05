@@ -1,13 +1,17 @@
 package org.guppy4j.html.content;
 
-import org.guppy4j.html.logic.Mapping;
-import org.guppy4j.html.marker.*;
-import org.guppy4j.html.model.Variable;
 import org.guppy4j.html.Out;
+import org.guppy4j.html.logic.Mapping;
+import org.guppy4j.html.marker.BodyContent;
+import org.guppy4j.html.marker.LabelContent;
+import org.guppy4j.html.marker.LegendContent;
+import org.guppy4j.html.marker.SpanContent;
+import org.guppy4j.html.marker.TitleContent;
+import org.guppy4j.html.model.Variable;
 
 import java.util.function.Function;
 
-import static org.guppy4j.html.logic.Functions.is;
+import static org.guppy4j.Functions.is;
 
 /**
  * Text nodes
@@ -19,7 +23,7 @@ public final class Text<M> implements TitleContent<M>, BodyContent<M>, SpanConte
         return new Text<>(is(value));
     }
 
-    public static <M> Text<M> $(Function<M, String> value) {
+    public static <M> Text<M> $(Function<M, Object> value) {
         return new Text<>(value);
     }
 
