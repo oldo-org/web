@@ -10,7 +10,9 @@ import org.guppy4j.html.marker.HeadContent;
 public interface Metadata<M> extends HeadContent<M> {
 
 /*
-Metadata content is content that sets up the presentation or behavior of the rest of the content, or that sets up the relationship of the document with other documents, or that conveys other "out of band" information.
+Metadata content is content that sets up the presentation or behavior
+of the rest of the content, or that sets up the relationship of the document
+with other documents, or that conveys other "out of band" information.
 
     base
     link

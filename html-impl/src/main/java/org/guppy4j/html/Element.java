@@ -2,7 +2,7 @@ package org.guppy4j.html;
 
 /**
  * Enumeration of all valid HTML5 tag, based on the
- * <a href="https://developer.mozilla.org/en/docs/HTML/HTML5/HTML5_element_list">
+ * <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element">
  * HTML5 element list</a> at developer.mozilla.org.
  */
 public enum Element {
@@ -63,29 +63,58 @@ public enum Element {
      */
     noscript,
 
-    /* --- Sections --- */
+    /* --- Content sectioning --- */
 
     /**
-     * Defines a section in a document
+     * Content provides contact information for a person or people, or for an organization
+     */
+    address,
+
+    /**
+     * A standalone section, which doesn't have a more specific semantic element to represent it,
+     * contained within an HTML document
      */
     section,
+
     /**
-     * Defines a section that contains only navigation links
+     * Defines a section that contains only navigation links, either within the current document
+     * or to other documents. Examples are menus, tables of contents, and indexes.
      */
     nav,
+
     /**
-     *
+     * Introductory content, typically a group of introductory or navigational aids. It may contain
+     * some heading elements but also other elements like a logo, a search form, an author name, etc
+     */
+    header,
+
+    /**
+     * A footer for its nearest sectioning content or sectioning root element. A footer typically
+     * contains info about the author of the section, copyright data or links to related documents.
+     */
+    footer,
+
+    /**
+     * A self-contained composition in a document, page, application, or site, intended to be
+     * independently distributable or reusable (e.g., in syndication).
+     * Examples include: a forum post, a magazine or newspaper article, or a blog entry.
      */
     article,
+
     /**
-     *
+     * Content that is only indirectly related to the document's main content
      */
     aside,
+
     /**
-     *
+     * Six levels of section headings, h1 is the highest and h6 is the lowest
      */
     h1, h2, h3, h4, h5, h6,
 
+    /**
+     * A multi-level heading for a section of a document. It groups a set of h1 - h6 elements.
+     */
+    hgroup,
 
     /* --- Grouping content --- */
 
