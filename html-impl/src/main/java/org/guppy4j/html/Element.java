@@ -7,7 +7,7 @@ package org.guppy4j.html;
  */
 public enum Element {
 
-    /* Root element */
+    /* Root elements */
 
     /**
      * Root of an HTML or XHTML document. All other tag
@@ -15,6 +15,10 @@ public enum Element {
      */
     html,
 
+    /**
+     * Main content of an HTML document.
+     * There is only one body element in a document.
+     */
     body,
 
     /* Document metadata */
@@ -24,13 +28,14 @@ public enum Element {
      * definitions of scripts and style sheets.
      */
     head,
+
     /**
      * Title of the document, typically shown in browser as window and tab
      * title. It can only contain text, contained tag are not interpreted.
      */
     title,
     /**
-     * Defines the base URL for relative URL in the page
+     * Base URL for relative URL in the page
      */
     base,
     /**
@@ -38,34 +43,49 @@ public enum Element {
      */
     link,
     /**
-     * Defines metadata that cannot be defined using other tag
+     * Metadata that cannot be defined using other tag
      */
     meta,
     /**
-     * Used to write inline CSS that applies only to this document
+     * Inline CSS that applies only to this document
      */
     style,
 
     /* Scripting */
 
     /**
-     * Defines either an internal script or link to an external script.
-     * The script language is JavaScript
+     * Either an internal script or link to an external script.
+     * The script language is JavaScript.
      */
     script,
     /**
-     * Defines an alternative content to display when the browser doesn't
-     * support scripting.
+     * Alternative content to display when the browser doesn't support scripting.
      */
     noscript,
 
     /* --- Sections --- */
 
+    /**
+     * Defines a section in a document
+     */
     section,
+    /**
+     * Defines a section that contains only navigation links
+     */
     nav,
+    /**
+     *
+     */
     article,
+    /**
+     *
+     */
     aside,
+    /**
+     *
+     */
     h1, h2, h3, h4, h5, h6,
+
 
     /* --- Grouping content --- */
 

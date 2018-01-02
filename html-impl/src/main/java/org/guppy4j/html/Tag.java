@@ -27,10 +27,8 @@ public class Tag<M, A extends Attribute<M>, C extends Content<M>> implements Ren
     @Override
     public final void render(Out r, M m) {
         open(r, m);
-        if (contents != null) {
-            for (C content : contents) {
-                content.render(r, m);
-            }
+        for (C content : contents) {
+            content.render(r, m);
         }
         close(r);
     }
@@ -38,10 +36,8 @@ public class Tag<M, A extends Attribute<M>, C extends Content<M>> implements Ren
     private void open(Out r, M m) {
         r.write('<');
         r.write(element.name());
-        if (attributes != null) {
-            for (A attribute : attributes) {
-                attribute.render(r, m);
-            }
+        for (A attribute : attributes) {
+            attribute.render(r, m);
         }
         r.write('>');
     }
