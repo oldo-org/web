@@ -41,6 +41,8 @@ For RESTful approach and readable API (but not the JSP part): +
 - https://github.com/caelum/vraptor +
 
 For some ideas around HTML generation in pure Java (DSL): + 
+- https://github.com/xmlet/HtmlFlow +
+- https://github.com/tipsy/j2html +
 - https://github.com/luiz/vraptor-html-dsl +
 - http://code.google.com/p/jatl/ +
 - https://github.com/emicklei/rendersnake +
