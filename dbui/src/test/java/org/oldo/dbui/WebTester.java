@@ -12,7 +12,6 @@ import org.oldo.html.tag.Html;
 import org.oldo.http.IServer;
 import org.oldo.http.Response;
 import org.oldo.http.ServerDaemon;
-import org.oldo.http.util.ServerRunner;
 
 import static java.util.Arrays.asList;
 import static org.oldo.html.attribute.AttributeFactory.lang;
@@ -27,51 +26,50 @@ import static org.oldo.html.tag.Head.head;
 import static org.oldo.html.tag.Html.html;
 import static org.oldo.html.tag.Span.span;
 import static org.oldo.html.tag.Title.title;
+import static org.oldo.http.util.ServerRunner.executeInstance;
 
 
 public class WebTester {
 
     @Test
     public void test() {
-        final String prettyHtml = Jsoup.parse("<!DOCTYPE html>" + getHtml()).toString();
-        final IServer server = request -> new Response(prettyHtml);
-        ServerRunner.executeInstance(new ServerDaemon("localhost", 9999, server));
-    }
-
-    private String getHtml() {
-        final Html<Model> html =
-
-                html(with(lang(Model::lang)),
-                        head(
-                                title($(Model::title))
-                        ),
-                        body(
-                                form(
-
-                                ),
-                                forEach(Model::names, Model::name,
-                                        span(
-                                                $(Model::name),
-                                                $(" !")
-                                        ),
-                                        div()
-                                ),
-                                forProperty(Model::part,
-                                        span(
-                                                $(Part::id)
-                                        )
-                                )
-
-                        )
-                );
-
-        final StringBuilder sb = new StringBuilder();
-        final Out out = new Appender(sb);
+        final Html<Model> html = getHtml();
         final Model model = createTestModel();
 
+        final StringBuilder htmlSource = new StringBuilder();
+        final Out out = new Appender(htmlSource);
         html.render(out, model);
 
-        return sb.toString();
+        final String prettyHtml = Jsoup.parse("<!DOCTYPE html>" + htmlSource).toString();
+        final IServer server = request -> new Response(prettyHtml);
+
+        executeInstance(new ServerDaemon("localhost", 9999, server));
+    }
+
+    private Html<Model> getHtml() {
+        return
+            html(with(lang(Model::lang)),
+                head(
+                        title($(Model::title))
+                ),
+                body(
+                        form(
+
+                        ),
+                        forEach(Model::names, Model::name,
+                                span(
+                                        $(Model::name),
+                                        $(" !")
+                                ),
+                                div()
+                        ),
+                        forProperty(Model::part,
+                                span(
+                                        $(Part::id)
+                                )
+                        )
+                )
+            );
     }
 
     private Model createTestModel() {
