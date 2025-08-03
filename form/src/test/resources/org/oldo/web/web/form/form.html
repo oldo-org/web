@@ -1,0 +1,52 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<title>Compose an email</title>
+	<link rel="stylesheet" href="../../../../../../../../dbui/src/test/resources/org/oldo/dbui/style.css">
+</head>
+
+<body>
+
+<h1>New Email</h1>
+
+<form action="https://echo.free.beeceptor.com" method="post">
+
+	<label for="email">Email</label>
+	<input type="email" id="email" name="email" required />
+
+	<label for="date">Date</label>
+	<input type="date" id="date" name="date" required />
+
+	<label for="time">Time</label>
+	<input type="time" id="time" name="time" required />
+
+	<label for="color">Color</label>
+	<input type="color" id="color" name="color">
+
+	<label for="attachment">Attachment</label>
+	<input type="file" id="attachment" name="attachment">
+
+	<label for="score">Score</label>
+	<input type="range" min="1" max="10" id="score" name="score" list="scores"/>
+
+	<label for="important">Important</label>
+	<input type="checkbox" id="important" name="important">
+
+	<label>Radio group</label>
+	<input type="radio" id="radio-1" value="1" name="radio">
+	<label for="radio-1">Option 1</label>
+	<input type="radio" id="radio-2" value="2" name="radio">
+	<label for="radio-2">Option 2</label>
+	<input type="radio" id="radio-3" value="3" name="radio">
+	<label for="radio-3">Option 3</label>
+
+	<input id="submit" name="submit" type="submit"
+	       value="Submit Form"/>
+</form>
+
+<datalist id="scores">
+	<option value="1" label="Bad"></option>
+	<option value="10" label="Great"></option>
+</datalist>
+
+</body>
+</html>

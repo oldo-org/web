@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>web</artifactId>
-        <groupId>org.oldo</groupId>
+        <artifactId>parent</artifactId>
+        <groupId>org.oldo.web</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -14,18 +14,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.oldo</groupId>
+            <groupId>org.oldo.web</groupId>
             <artifactId>html-impl</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.oldo</groupId>
+            <groupId>org.oldo.web</groupId>
             <artifactId>http-impl</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.15.4</version>
             <scope>test</scope>
         </dependency>
 

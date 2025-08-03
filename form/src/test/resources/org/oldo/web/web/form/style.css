@@ -1,0 +1,46 @@
+html {
+ font-family: sans;
+}
+body {
+ background-color: #eeeeee;
+}
+
+label, input {
+ display: block;
+}
+
+input[type=radio], input[type=radio] + label {
+ display: inline;
+ font-weight: normal;
+}
+
+label {
+ font-size: 0.9em;
+ font-weight: bold;
+}
+
+label:has(+ input[required]):after {
+  content: " *";
+  color: red;
+  font-weight: normal;
+}
+
+input {
+ clear:left;
+ margin-bottom: 1em;
+ border: 1pt solid grey;
+ border-radius: 5px;
+}
+
+input:invalid {
+ box-shadow: 0 0 5px 1px red;
+}
+
+input[type=submit] {
+ margin-top: 2em;
+ background-color: lightgreen;
+}
+
+form:has(:invalid) :where(input[type=submit]) {
+  background-color: gray;
+}

@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.oldo</groupId>
-    <artifactId>web</artifactId>
+    <groupId>org.oldo.web</groupId>
+    <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -17,7 +17,7 @@
             <name>Ol Do</name>
             <email>web@oldo.org</email>
             <organization>oldo.org</organization>
-            <organizationUrl>http://guppy4j.org/</organizationUrl>
+            <organizationUrl>http://oldo.org/</organizationUrl>
         </developer>
     </developers>
 
@@ -34,8 +34,9 @@
         <module>http</module>
         <module>http-impl</module>
         <module>css</module>
+			  <module>form</module>
         <module>dbui</module>
-    </modules>
+		</modules>
 
     <licenses>
         <license>
@@ -45,7 +46,7 @@
     </licenses>
 
     <properties>
-        <required.java.version>17</required.java.version>
+        <required.java.version>21</required.java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- 3rd party library versions -->
@@ -72,32 +73,37 @@
         <dependencies>
 
             <dependency>
-                <groupId>org.oldo</groupId>
+                <groupId>org.oldo.web</groupId>
                 <artifactId>html</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.oldo</groupId>
+                <groupId>org.oldo.web</groupId>
                 <artifactId>html-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.oldo</groupId>
+                <groupId>org.oldo.web</groupId>
                 <artifactId>http</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.oldo</groupId>
+                <groupId>org.oldo.web</groupId>
                 <artifactId>http-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.oldo</groupId>
+                <groupId>org.oldo.web</groupId>
                 <artifactId>css</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.oldo</groupId>
+                <groupId>org.oldo.web</groupId>
+                <artifactId>form</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.oldo.web</groupId>
                 <artifactId>dbui</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -137,6 +143,12 @@
                 <version>${guppy4j.libraries.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.15.4</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -163,6 +175,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${maven-jar-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

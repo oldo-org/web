@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.oldo</groupId>
-        <artifactId>web</artifactId>
+        <groupId>org.oldo.web</groupId>
+        <artifactId>parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
